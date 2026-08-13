@@ -138,15 +138,20 @@ const [search, setSearch] = useState("");
 
     const columns = [
         {
+          name: "Patient Code",
+          selector: (row) => row.PatientId,
+          sortable: true,
+        },
+        {
           name: "Patient Name",
           selector: (row) => row.Name,
           sortable: true,
         },
-        // {
-        //   name: "CaseNo",
-        //   selector: (row) => row.CaseNo,
-        //   sortable: true,
-        // },
+        {
+          name: "CaseNo",
+          selector: (row) => row.CaseNo,
+          sortable: true,
+        },
         // {
         //   name: "Name",
         //   selector: (row) => row.Name,
@@ -431,8 +436,13 @@ const [search, setSearch] = useState("");
 
 
   useEffect(() => {
-    const result = requests.filter((patientname) => {
-      return patientname.ClinicName.toLowerCase().match(search.toLowerCase());
+    const result = requests.filter((item) => {
+      const s = search.toLowerCase();
+      return (
+        (item.PatientId?.toString() || "").toLowerCase().includes(s) ||
+        (item.Name || "").toLowerCase().includes(s) ||
+        (item.ClinicName || "").toLowerCase().includes(s)
+      );
     });
     setFilteredNames(result);
   }, [search]);
@@ -627,7 +637,7 @@ const [search, setSearch] = useState("");
                       <input
                         type="text"
                         className="w-25 form-control mt-4 mb-4"
-                        placeholder="Search by clinic"
+                        placeholder="Search by Code, Name, Clinic..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                       ></input>

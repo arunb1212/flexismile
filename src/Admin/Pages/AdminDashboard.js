@@ -9,6 +9,7 @@ import {
     Dropdown,
     Card,
     Badge,
+    Form,
   } from "react-bootstrap";
   import "../../Doctor/Styles/Dashboard.css";
   import user from "../../Assets/user.png";
@@ -252,11 +253,9 @@ fetch(apiurl)
         </Row>
       </Container>
       <Container>
-        <Row style={{ backgroundColor: "white" }} className="mt-5 mb-5 pb-5">
-          <Col md={{ span: 12 }} xs={{ span: 12 }}>
             <Row>
               <Col md={ 6 }>
-                <Row className="mt-5">
+                <Row className="mt-4">
                   <Col
                     md={{ span: 5, offset: 1 }}
                     xs={{ span: 10, offset: 1 }}
@@ -443,8 +442,6 @@ fetch(apiurl)
                 </Row>
               </Col> */}
             {/* </Row> */}
-          </Col>
-        </Row>
       </Container>
 
       </>  

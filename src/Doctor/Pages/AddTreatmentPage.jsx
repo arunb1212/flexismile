@@ -2597,10 +2597,46 @@ function formatDate(date) {
                                       <option value={2}>Plan 2</option>
                                       <option value={3}>Plan 3</option>
                                       <option value={4}>Plan 4</option>
+                                      <option value={5}>Rescan</option>
                                     </Form.Select>
                                   </Form.Group>
                                 </Col>
                               </Row>
+
+                              {/* Patient Basic Details */}
+                              <Row className="mt-3 mb-3" style={{ backgroundColor: "#f8f9fa", borderRadius: "8px", padding: "15px", border: "1px solid #dee2e6" }}>
+                                <Col xs={12}>
+                                  <p style={{ fontSize: "1.15rem", fontWeight: "bold", color: "#C49358", marginBottom: "12px" }}>Patient Basic Details</p>
+                                </Col>
+                                <Col md={4} sm={12} className="mb-2">
+                                  <p style={{ fontSize: "1rem", fontWeight: "bold", marginBottom: "4px" }}>Name : <span style={{ fontWeight: "normal" }}>{patient[0]?.Name}</span></p>
+                                </Col>
+                                <Col md={4} sm={12} className="mb-2">
+                                  <p style={{ fontSize: "1rem", fontWeight: "bold", marginBottom: "4px" }}>Case Paper No : <span style={{ fontWeight: "normal" }}>{patient[0]?.CaseNo}</span></p>
+                                </Col>
+                                <Col md={4} sm={12} className="mb-2">
+                                  <p style={{ fontSize: "1rem", fontWeight: "bold", marginBottom: "4px" }}>Gender : <span style={{ fontWeight: "normal" }}>{patient[0]?.Gender}</span></p>
+                                </Col>
+                                <Col md={4} sm={12} className="mb-2">
+                                  <p style={{ fontSize: "1rem", fontWeight: "bold", marginBottom: "4px" }}>DOB : <span style={{ fontWeight: "normal" }}>{patient[0]?.DateofBirth?.split(' ')[0]}</span></p>
+                                </Col>
+                                <Col md={4} sm={12} className="mb-2">
+                                  <p style={{ fontSize: "1rem", fontWeight: "bold", marginBottom: "4px" }}>MI : <span style={{ fontWeight: "normal" }}>{patient[0]?.Mi}</span></p>
+                                </Col>
+                                <Col md={4} sm={12} className="mb-2">
+                                  <p style={{ fontSize: "1rem", fontWeight: "bold", marginBottom: "4px" }}>Doctor's Name : <span style={{ fontWeight: "normal" }}>{patient[0]?.DoctorName}</span></p>
+                                </Col>
+                                <Col md={4} sm={12} className="mb-2">
+                                  <p style={{ fontSize: "1rem", fontWeight: "bold", marginBottom: "4px" }}>Clinic Address : <span style={{ fontWeight: "normal" }}>{patient[0]?.ClinicAddress}</span></p>
+                                </Col>
+                                <Col md={4} sm={12} className="mb-2">
+                                  <p style={{ fontSize: "1rem", fontWeight: "bold", marginBottom: "4px" }}>Registration Date : <span style={{ fontWeight: "normal" }}>{patient[0]?.RegDate}</span></p>
+                                </Col>
+                                <Col md={4} sm={12} className="mb-2">
+                                  <p style={{ fontSize: "1rem", fontWeight: "bold", marginBottom: "4px" }}>Product Type : <span style={{ fontWeight: "normal" }}>{patient[0]?.ProductType === "1" ? "Classic" : "Premium"}</span></p>
+                                </Col>
+                              </Row>
+
                             </Col>
                           </Row>
                           <Row className="pt-4 justify-content-center px-5">

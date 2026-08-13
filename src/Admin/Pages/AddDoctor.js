@@ -21,6 +21,8 @@ import user from "../../Assets/user.png";
 import { LinkContainer } from "react-router-bootstrap";
 import Swal from "sweetalert2";
 
+import { fetchClinicList } from "../../Utils/clinicApi";
+
 function AddDoctor() {
   // const [activePath, setActivePath] = useState();
 
@@ -38,6 +40,8 @@ let AdminName=sessionStorage.getItem("DocName")
     LastName: "",
     PracticeName: "",
     PracticeName1: "",
+    ClinicType: "",
+    ClinicName: "",
     TaxID: "",
     Street1: "",
     Street2: "",
@@ -54,6 +58,22 @@ let AdminName=sessionStorage.getItem("DocName")
     StateId: "",
     CityID: "",
   });
+
+  const [clinicType, setClinicType] = useState("");
+  const [clinicName, setClinicName] = useState("");
+  const [selectedClinic, setSelectedClinic] = useState("");
+  const [clinicList, setClinicList] = useState([]);
+
+  useEffect(() => {
+    fetchClinicList().then((list) => {
+      if (list) {
+        setClinicList(list);
+      }
+    });
+  }, []);
+
+  const osClinics = clinicList.filter((c) => c.ClinicGroupCode === "OS");
+  const avmClinics = clinicList.filter((c) => (c.ClinicGroupCode || "").includes("AVM"));
 
   const [checked, setChecked] = useState({
     isSelCCountry: false,
@@ -204,13 +224,19 @@ let Role=sessionStorage.getItem("Role");
 
     setValidated(true);
 
+    const payload = {
+      ...data,
+      ClinicType: clinicType,
+      ClinicName: selectedClinic || data.PracticeName,
+    };
+
     fetch(url, {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     })
       .then((res) => res.json())
       .then((result) => {
@@ -432,6 +458,133 @@ let Role=sessionStorage.getItem("Role");
                       validated={validated}
                       onSubmit={handleSubmit}
                     >
+                      {/* Clinic Type Radio Buttons */}
+                      <Row className="mb-4">
+                        <Col md={12}>
+                          <Form.Group>
+                            <Form.Label style={{ fontWeight: "bold", fontSize: "1.1rem" }}>Clinic Type</Form.Label>
+                            <div className="d-flex gap-4 mt-2">
+                              <Form.Check
+                                inline
+                                type="radio"
+                                id="clinicType-orthosquare"
+                                label="Orthosquare"
+                                name="clinicType"
+                                value="Orthosquare"
+                                checked={clinicType === "Orthosquare"}
+                                onChange={(e) => {
+                                  setClinicType(e.target.value);
+                                  setSelectedClinic("");
+                                  setData((pre) => ({ ...pre, ClinicType: e.target.value, ClinicName: "", PracticeName: "" }));
+                                }}
+                              />
+                              <Form.Check
+                                inline
+                                type="radio"
+                                id="clinicType-avm"
+                                label="AVM Smiles"
+                                name="clinicType"
+                                value="AVM"
+                                checked={clinicType === "AVM"}
+                                onChange={(e) => {
+                                  setClinicType(e.target.value);
+                                  setSelectedClinic("");
+                                  setData((pre) => ({ ...pre, ClinicType: e.target.value, ClinicName: "", PracticeName: "" }));
+                                }}
+                              />
+                              <Form.Check
+                                inline
+                                type="radio"
+                                id="clinicType-flexismile"
+                                label="Flexismile"
+                                name="clinicType"
+                                value="Flexismile"
+                                checked={clinicType === "Flexismile"}
+                                onChange={(e) => {
+                                  setClinicType(e.target.value);
+                                  setSelectedClinic("");
+                                  setData((pre) => ({ ...pre, ClinicType: e.target.value, ClinicName: "", PracticeName: "" }));
+                                }}
+                              />
+                            </div>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+
+                      {/* Clinic Dropdown for Orthosquare */}
+                      {clinicType === "Orthosquare" && (
+                        <Row className="mb-3">
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label>Select Orthosquare Clinic</Form.Label>
+                              <Form.Select
+                                className="p-3"
+                                value={selectedClinic}
+                                onChange={(e) => {
+                                  setSelectedClinic(e.target.value);
+                                  setData((pre) => ({ ...pre, ClinicName: e.target.value, PracticeName: e.target.value }));
+                                }}
+                              >
+                                <option value="" disabled>Select a Clinic</option>
+                                {osClinics.map((c) => (
+                                  <option key={c.ClinicId} value={c.ClinicName}>
+                                    {c.ClinicName}
+                                  </option>
+                                ))}
+                              </Form.Select>
+                            </Form.Group>
+                          </Col>
+                        </Row>
+                      )}
+
+                      {/* Clinic Dropdown for AVM */}
+                      {clinicType === "AVM" && (
+                        <Row className="mb-3">
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label>Select AVM Clinic</Form.Label>
+                              <Form.Select
+                                className="p-3"
+                                value={selectedClinic}
+                                onChange={(e) => {
+                                  setSelectedClinic(e.target.value);
+                                  setData((pre) => ({ ...pre, ClinicName: e.target.value, PracticeName: e.target.value }));
+                                }}
+                              >
+                                <option value="" disabled>Select a Clinic</option>
+                                {avmClinics.map((c) => (
+                                  <option key={c.ClinicId} value={c.ClinicName}>
+                                    {c.ClinicName} ({c.ClinicGroupCode})
+                                  </option>
+                                ))}
+                              </Form.Select>
+                            </Form.Group>
+                          </Col>
+                        </Row>
+                      )}
+
+                      {/* Clinic Name Textbox for Flexismile */}
+                      {clinicType === "Flexismile" && (
+                        <Row className="mb-3">
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label>Clinic Name</Form.Label>
+                              <Form.Control
+                                type="text"
+                                placeholder="Enter Practice / Clinic Name"
+                                className="p-3"
+                                name="PracticeName"
+                                value={data.PracticeName}
+                                onChange={(e) => {
+                                  handle(e);
+                                  setData((pre) => ({ ...pre, ClinicName: e.target.value, PracticeName: e.target.value }));
+                                }}
+                              />
+                            </Form.Group>
+                          </Col>
+                        </Row>
+                      )}
+
                       <Row className="">
                         <Col md={6}>
                           <Form.Group controlId="validationCustom01">

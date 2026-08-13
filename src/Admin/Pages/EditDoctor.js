@@ -56,6 +56,8 @@ function EditDoctor(){
     LastName: "",
     PracticeName: "",
     PracticeName1: "",
+    ClinicType: "",
+    ClinicName: "",
     TaxID: "",
     Street1: "",
     Street2: "",
@@ -96,6 +98,8 @@ const ID=urlParams.DoctorId;
               LastName:list.Data[0]?.Name.split(' ')[1],
               PracticeName:list.Data[0]?.PracticeName,
               PracticeName1:list.Data[0]?.PracticeName1,
+              ClinicType:list.Data[0]?.ClinicType || "",
+              ClinicName:list.Data[0]?.ClinicName || list.Data[0]?.PracticeName || "",
               TaxID:list.Data[0]?.TaxID,
               Street1:list.Data[0]?.Address.split(',')[0],
               Street2:list.Data[0]?.Address.split(',')[1],
@@ -265,13 +269,19 @@ let Role=sessionStorage.getItem("Role");
 
     setValidated(true);
 
+    const payload = {
+      ...data,
+      ClinicType: data.ClinicType,
+      ClinicName: data.ClinicName || data.PracticeName,
+    };
+
     fetch(url, {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     })
       .then((res) => res.json())
       .then((result) => {

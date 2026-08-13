@@ -185,16 +185,21 @@ const [totalLower, setTotalLower] = useState(0);
 
     const columns = [
         {
-          name: "Case No",
-          selector: (row) => row.CaseNo,
+          name: "Patient Code",
+          selector: (row) => row.PatientId,
           sortable: true,
-          // center:true,
         },
         {
           id:"center",
           name: "Patient Name",
           selector: (row) => row.Name,
           sortable: true,
+        },
+        {
+          name: "Case No",
+          selector: (row) => row.CaseNo,
+          sortable: true,
+          // center:true,
         },
         {
           id:"center",
@@ -224,6 +229,12 @@ const [totalLower, setTotalLower] = useState(0);
           selector: (row) => row.Quotation-row.AmountPaid,
           sortable: true,
         },
+        {
+          id:"center",
+          name: "Last Order Date",
+          selector: (row) => row.DateOn ? row.DateOn.split(" ")[0] : "-",
+          sortable: true,
+        },
        
         
         {
@@ -231,13 +242,18 @@ const [totalLower, setTotalLower] = useState(0);
           name:"Request for Aligners",
           cell: (row) => (
             <Button variant="" className="edit-patient-btn" onClick={()=>{
+              setUpperChecked([]);
+              setLowerChecked([]);
+              setIsCompleteSet(false);
               handleShowRequest();
               setRequestSets((pre)=>{
                 return{...pre,PatientSetsId:row.PatientSetsId,
                 PatientId:row.PatientId,
                 // NoOfSets:row.NoOfSets,
                 DoctorId:DoctorUId,
-                PatientTotalSetsId:row.PatientTotalSetsId
+                PatientTotalSetsId:row.PatientTotalSetsId,
+                TextForUpperAligners: [],
+                TextForLowerAligners: []
                 }
               })
 
@@ -290,8 +306,13 @@ const [totalLower, setTotalLower] = useState(0);
       ];
 
       useEffect(() => {
-        const result = data.filter((patientname) => {
-          return patientname.Name.toLowerCase().match(search.toLowerCase());
+        const result = data.filter((item) => {
+          const s = search.toLowerCase();
+          return (
+            (item.PatientId?.toString() || "").toLowerCase().includes(s) ||
+            (item.CaseNo || "").toLowerCase().includes(s) ||
+            (item.Name || "").toLowerCase().includes(s)
+          );
         });
         setFilteredNames(result);
       }, [search]);
@@ -335,10 +356,41 @@ const [totalLower, setTotalLower] = useState(0);
 
       const [UpperChecked, setUpperChecked] = useState([]);
       const [LowerChecked, setLowerChecked] = useState([]);
+      const [isCompleteSet, setIsCompleteSet] = useState(false);
+      const [alignerType, setAlignerType] = useState("");
 
       const a = 20;
   const checkboxes = Array.from({ length: totalUpper }, (_, index) => index + 1);
   const checkboxes1 = Array.from({ length: totalLower }, (_, index) => index + 1);
+
+  const handleSelectCompleteSet = (checked) => {
+    setIsCompleteSet(checked);
+    if (checked) {
+      // Select all upper aligners including T and R
+      const allUpper = ["T", ...Array.from({ length: totalUpper }, (_, i) => i + 1), "R"];
+      setUpperChecked(allUpper);
+      setRequestSets((pre) => ({
+        ...pre,
+        TextForUpperAligners: allUpper,
+      }));
+      // Select all lower aligners including T and R
+      const allLower = ["T", ...Array.from({ length: totalLower }, (_, i) => i + 1), "R"];
+      setLowerChecked(allLower);
+      setRequestSets((pre) => ({
+        ...pre,
+        TextForLowerAligners: allLower,
+      }));
+    } else {
+      // Deselect all
+      setUpperChecked([]);
+      setLowerChecked([]);
+      setRequestSets((pre) => ({
+        ...pre,
+        TextForUpperAligners: [],
+        TextForLowerAligners: [],
+      }));
+    }
+  };
 
 
 
@@ -444,7 +496,9 @@ const [totalLower, setTotalLower] = useState(0);
           TextForUpperAligners:UpperSetsReqBody.Uppersets
         }
       })
-      uppercheckFunc();
+      if (typeof checkbox === 'number') {
+        uppercheckFunc();
+      }
     }
 
 
@@ -534,7 +588,9 @@ const [totalLower, setTotalLower] = useState(0);
           TextForLowerAligners:LowerSetsReqBody.Lowersets
         }
       })
-      lowercheckFunc();
+      if (typeof checkbox === 'number') {
+        lowercheckFunc();
+      }
     }
 
     console.log(LowerSetsReqBody1);
@@ -696,7 +752,7 @@ const [totalLower, setTotalLower] = useState(0);
                     <input
                       type="text"
                       className="w-25 form-control mt-4 mb-4"
-                      placeholder="Search by Name"
+                      placeholder="Search by Code, Name, Case No..."
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                     ></input>
@@ -721,77 +777,121 @@ const [totalLower, setTotalLower] = useState(0);
                   <Modal.Title></Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+
+                  <Form.Check
+                    type="checkbox"
+                    id="complete-set-checkbox"
+                    label="Select Complete Set (All Upper & Lower Aligners)"
+                    checked={isCompleteSet}
+                    onChange={(e) => handleSelectCompleteSet(e.target.checked)}
+                    className="mb-3"
+                    style={{ fontWeight: "bold", fontSize: "16px", color: "#C49358" }}
+                  />
+
+                  <div className="mb-4">
+                    <Form.Label style={{ fontWeight: "bold", fontSize: "15px", color: "#333" }}>Aligner Type:</Form.Label>
+                    <div className="d-flex flex-wrap gap-4 mt-1">
+                      <Form.Check
+                        inline
+                        type="radio"
+                        id="type-partial"
+                        label="Partial"
+                        name="alignerTypeSelection"
+                        value="Partial"
+                        checked={alignerType === "Partial"}
+                        onChange={(e) => setAlignerType(e.target.value)}
+                        style={{ fontWeight: "600", cursor: "pointer" }}
+                      />
+                      <Form.Check
+                        inline
+                        type="radio"
+                        id="type-retainer"
+                        label="Retainer"
+                        name="alignerTypeSelection"
+                        value="Retainer"
+                        checked={alignerType === "Retainer"}
+                        onChange={(e) => setAlignerType(e.target.value)}
+                        style={{ fontWeight: "600", cursor: "pointer" }}
+                      />
+                      <Form.Check
+                        inline
+                        type="radio"
+                        id="type-nightguard"
+                        label="Night Guard"
+                        name="alignerTypeSelection"
+                        value="Night Guard"
+                        checked={alignerType === "Night Guard"}
+                        onChange={(e) => setAlignerType(e.target.value)}
+                        style={{ fontWeight: "600", cursor: "pointer" }}
+                      />
+                    </div>
+                  </div>
+                  <hr />
+
                   
                   <Form.Group
                     className="mb-3"
                     controlId="exampleForm.ControlInput1"
                   >
                     <Form.Label className="modal-lbl">Request Upper Aligners set no.</Form.Label>
-                    {/* <Form.Control
-                      type="text"
-                      name="TextForUpperAligners"
-                      onChange={(e) => onChangeRequest(e)}
-                      value={requestSets.TextForUpperAligners}
-                      required
-                    /> */}
-{/* {generateCheckboxes()} */}
-<div className="mt-3"><span className="" style={{fontWeight:500}}>T</span>
-      {checkboxes.map((checkbox,i) => (
-        <label key={checkbox} className="m-3">
-          <input type="checkbox"               checked={requestSets.TextForUpperAligners.includes(i+1)}
- onChange={() => handleCheckboxChange(checkbox)}/> <br />
-          {/* Checkbox */}
-           <span className="">{checkbox}</span>
-        </label>
-      ))}
-    <span style={{fontWeight:500}}>R</span></div>
-{/* {JSON.stringify(selected)} */}
-                    {/* <TagsInput
-        value={selected}
-        onChange={setSelected}
-        name="TextForUpperAligners"
-        placeHolder=""
-      /> */}
+                    <div className="mt-3">
+                      <label className="m-3 text-center">
+                        <input
+                          type="checkbox"
+                          checked={UpperChecked.includes("T")}
+                          onChange={() => handleCheckboxChange("T")}
+                        /> <br />
+                        <span style={{ fontWeight: 500 }}>T</span>
+                      </label>
+                      {checkboxes.map((checkbox,i) => (
+                        <label key={checkbox} className="m-3 text-center">
+                          <input type="checkbox" checked={requestSets.TextForUpperAligners.includes(i+1)}
+                          onChange={() => handleCheckboxChange(checkbox)}/> <br />
+                           <span className="">{checkbox}</span>
+                        </label>
+                      ))}
+                      <label className="m-3 text-center">
+                        <input
+                          type="checkbox"
+                          checked={UpperChecked.includes("R")}
+                          onChange={() => handleCheckboxChange("R")}
+                        /> <br />
+                        <span style={{ fontWeight: 500 }}>R</span>
+                      </label>
+                    </div>
                   </Form.Group>
-
-                  {/* <Form.Group
-                    className="mb-3"
-                    controlId="exampleForm.ControlInput1"
-                  >
-                    <Form.Label>Which Upper Aligners you want?</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="TextForUpperAligners"
-                      onChange={(e) => onChangeRequest(e)}
-
-                      value={requestSets.TextForUpperAligners}
-                      required
-                    />
-                  </Form.Group> */}
 
                   <Form.Group
                     className="mb-3"
                     controlId="exampleForm.ControlInput1"
                   >
                     <Form.Label className="modal-lbl">Request Lower Aligners set no.</Form.Label>
-                    {/* <Form.Control
-                      type="text"
-                      name="TextForLowerAligners"
-                      onChange={(e) => onChangeRequest(e)}
 
-                      value={requestSets.TextForLowerAligners}
-                      required
-                    /> */}
-
-<div><span style={{fontWeight:500}}>T</span>
-      {checkboxes1.map((checkbox,i) => (
-        <label key={checkbox} className="m-3">
-          <input type="checkbox" checked={requestSets.TextForLowerAligners.includes(i+1)} onChange={() => handleCheckboxChange1(checkbox)}/> <br />
-          {/* Checkbox */}
-           <span className="">{checkbox}</span>
-        </label>
-      ))}
-   <span style={{fontWeight:500}}>R</span> </div>
+                    <div>
+                      <label className="m-3 text-center">
+                        <input
+                          type="checkbox"
+                          checked={LowerChecked.includes("T")}
+                          onChange={() => handleCheckboxChange1("T")}
+                        /> <br />
+                        <span style={{ fontWeight: 500 }}>T</span>
+                      </label>
+                      {checkboxes1.map((checkbox,i) => (
+                        <label key={checkbox} className="m-3 text-center">
+                          <input type="checkbox" checked={requestSets.TextForLowerAligners.includes(i+1)} onChange={() => handleCheckboxChange1(checkbox)}/> <br />
+                           <span className="">{checkbox}</span>
+                        </label>
+                      ))}
+                      <label className="m-3 text-center">
+                        <input
+                          type="checkbox"
+                          checked={LowerChecked.includes("R")}
+                          onChange={() => handleCheckboxChange1("R")}
+                        /> <br />
+                        <span style={{ fontWeight: 500 }}>R</span>
+                      </label>
+                    </div>
+                  </Form.Group>
 
 {/* <TagsInput
         value={selected1}
@@ -799,7 +899,6 @@ const [totalLower, setTotalLower] = useState(0);
         name="TextForLowerAligners"
         placeHolder=""
       /> */}
-                  </Form.Group>
 
 
                   {/* <Form.Group
@@ -849,6 +948,7 @@ const [totalLower, setTotalLower] = useState(0);
 
                       let n={
                         ...requestSets,
+                        AlignerType: alignerType,
                         TextForUpperAligners:requestSets.TextForUpperAligners.toString(),
                         TextForLowerAligners:requestSets.TextForLowerAligners.toString()
                       }

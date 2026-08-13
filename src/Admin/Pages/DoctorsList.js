@@ -27,8 +27,11 @@ import { useNavigate ,useParams} from "react-router-dom";
 import { CgProfile } from "react-icons/cg";
 import $ from "jquery";
 
+import { fetchClinicList } from "../../Utils/clinicApi";
+
 function DoctorsList() {
   const [searchInput, setSearchInput] = useState("");
+  const [selectedClinic, setSelectedClinic] = useState("All");
 
 
 
@@ -85,21 +88,66 @@ function DoctorsList() {
        
       });
   }, []);
-  const [filteredResults, setFilteredResults] = useState([]);
+  const [clinicList, setClinicList] = useState([]);
 
-  const searchItems = (searchValue) => {
-    setSearchInput(searchValue);
-    if (searchInput !== "") {
-      const filteredData = data.filter((item) => {
-        return Object.values(item)
-          .join("")
-          .toLowerCase()
-          .includes(searchInput.toLowerCase());
+  useEffect(() => {
+    fetchClinicList().then((list) => {
+      if (list) {
+        setClinicList(list);
+      }
+    });
+  }, []);
+
+  const getFilteredDoctors = () => {
+    let list = data;
+
+    if (selectedClinic !== "All") {
+      const osClinicNames = clinicList
+        .filter((c) => c.ClinicGroupCode === "OS")
+        .map((c) => (c.ClinicName || "").toLowerCase());
+
+      const avmClinicNames = clinicList
+        .filter((c) => (c.ClinicGroupCode || "").includes("AVM"))
+        .map((c) => (c.ClinicName || "").toLowerCase());
+
+      list = list.filter((doc) => {
+        const docClinic = (doc.ClinicName || doc.PracticeName || doc.Clinic || "").toLowerCase();
+        const docType = (doc.ClinicType || "").toLowerCase();
+        const selType = selectedClinic.toLowerCase();
+
+        if (docType) {
+          if (selType.includes("orthosquare") && docType.includes("ortho")) return true;
+          if (selType.includes("avm") && docType.includes("avm")) return true;
+          if (selType.includes("flexi") && docType.includes("flexi")) return true;
+        }
+
+        if (selectedClinic === "Orthosquare") {
+          return osClinicNames.includes(docClinic) || docClinic.includes("ortho") || docClinic.includes("os");
+        } else if (selectedClinic === "AVM Smiles" || selectedClinic === "AVM") {
+          return avmClinicNames.includes(docClinic) || docClinic.includes("avm");
+        } else if (selectedClinic === "Flexismile") {
+          return docClinic.includes("flexi") || (!osClinicNames.includes(docClinic) && !avmClinicNames.includes(docClinic));
+        }
+        return docClinic.includes(selectedClinic.toLowerCase());
       });
-      setFilteredResults(filteredData);
-    } else {
-      setFilteredResults(data);
     }
+
+    if (searchInput.trim() !== "") {
+      const s = searchInput.toLowerCase();
+      list = list.filter((doc) => {
+        return (
+          (doc.DoctorID?.toString() || "").toLowerCase().includes(s) ||
+          (doc.Name || "").toLowerCase().includes(s) ||
+          (doc.PracticeName || "").toLowerCase().includes(s) ||
+          (doc.ClinicName || "").toLowerCase().includes(s) ||
+          (doc.ClinicType || "").toLowerCase().includes(s) ||
+          (doc.PracticeEmail || "").toLowerCase().includes(s) ||
+          (doc.PhoneNo || "").toLowerCase().includes(s)
+        );
+      });
+    }
+
+    return list;
   };
 
   
@@ -264,7 +312,30 @@ let DoctorName=sessionStorage.getItem("DocName");
               <Row>
                 <Col>
                   <Card className="mt-2 m-3">
-                    <Row className="m-2 mt-5">
+                    <Row className="m-2 mt-4 align-items-center">
+                      <Col md={12}>
+                        <Form.Group className="d-flex align-items-center flex-wrap p-3 border rounded" style={{ backgroundColor: "#F9F6F0" }}>
+                          <Form.Label className="me-4 mb-0 fw-bold" style={{ color: "#C49358", fontSize: "16px" }}>Select Clinic:</Form.Label>
+                          {["All", "Orthosquare", "AVM Smiles", "Flexismile"].map((clinic) => (
+                            <Form.Check
+                              inline
+                              key={clinic}
+                              type="radio"
+                              id={`clinic-radio-${clinic}`}
+                              label={clinic}
+                              name="clinicSelection"
+                              value={clinic}
+                              checked={selectedClinic === clinic}
+                              onChange={(e) => setSelectedClinic(e.target.value)}
+                              className="me-4 my-1 fw-semibold"
+                              style={{ cursor: "pointer" }}
+                            />
+                          ))}
+                        </Form.Group>
+                      </Col>
+                    </Row>
+
+                    <Row className="m-2 mt-4">
                       <Col className="" md={9}>
                         <ReactHTMLTableToExcel
                           id="test-table-xls-button"
@@ -287,7 +358,7 @@ let DoctorName=sessionStorage.getItem("DocName");
                           <Col sm="9">
                             <Form.Control
                               type="search"
-                              onChange={(e) => searchItems(e.target.value)}
+                              onChange={(e) => setSearchInput(e.target.value)}
                             />
                           </Col>
                         </Form.Group>
@@ -318,173 +389,81 @@ let DoctorName=sessionStorage.getItem("DocName");
                           </thead>
 
                           <tbody>
-                            {searchInput.length > 1
-                              ? filteredResults.map((docList) => {
-                                  return (
-                                    <>
-                                      <tr id="tblrw">
-                                        {/* <th contenteditable="false" className="">1</th> */}
-                                        <td contenteditable="false">
-                                          {docList.DoctorID}
-                                        </td>
-                                        <td contenteditable="false">
-                                          {docList.Name}
-                                        </td>
-                                        <td contenteditable="false">1</td>
-                                        <td contenteditable="false">
-                                          {docList.PracticeName}
-                                        </td>
-                                        <td contenteditable="false">
-                                          {docList.PracticeEmail}
-                                        </td>
-                                        <td contenteditable="false">
-                                          {docList.PhoneNo}
-                                        </td>
-                                        <td contenteditable="false" className={`${docList.isActive==="True"?"stat-green":"stat-red"}`} id="stat">{docList.isActive==="True"?"Active":"Inactive"}</td>
-                                        <th>
-                                          <span>
-                                            <Button
-                                              variant=""
-                                              className="action-i"
-                                              onClick={()=>navigate(`/doctor-profile/${docList.DoctorID}`)}
-                                              
+                            {getFilteredDoctors().map((docList) => {
+                              return (
+                                <React.Fragment key={docList.DoctorID}>
+                                  <tr id="tblrw">
+                                    <td contenteditable="false">
+                                      {docList.DoctorID}
+                                    </td>
+                                    <td contenteditable="false">
+                                      {docList.Name}
+                                    </td>
+                                    <td contenteditable="false">1</td>
+                                    <td contenteditable="false">
+                                      {docList.PracticeName}
+                                    </td>
+                                    <td contenteditable="false">
+                                      {docList.PracticeEmail}
+                                    </td>
+                                    <td contenteditable="false">
+                                      {docList.PhoneNo}
+                                    </td>
+                                    <td contenteditable="false" className={`${docList.isActive==="True"?"stat-green":"stat-red"}`} id="stat">{docList.isActive==="True"?"Active":"Inactive"}</td>
+                                    <th>
+                                      <span>
+                                        <Button
+                                          variant=""
+                                          className="action-i"
+                                          onClick={()=>navigate(`/doctor-profile/${docList.DoctorID}`)}
+                                        >
+                                          <IoEyeOutline color="black" />
+                                        </Button>
+                                      </span>
+                                      <span>
+                                        <Button
+                                          variant=""
+                                          className="action-i edit editbtn"
+                                        >
+                                          Edit
+                                        </Button>
+                                      </span>
+                                      <span>
+                                        <Button
+                                          variant=""
+                                          className=""
+                                          onClick={(e)=>{
+                                            e.preventDefault();
+                                            const url2="https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/DoctorInActive"
 
-                                            >
-                                              <IoEyeOutline color="black" />
-                                            </Button>
-                                          </span>
-                                          {/* <span><Button variant="" className="action-i add"><FaPlus color="black"/></Button></span> */}
-                                          <span>
-                                            <Button
-                                              variant=""
-                                              className="action-i edit editbtn"
-                                            >
-                                              Edit
-                                            </Button>
-                                          </span>
-                                          <span>
-                                            <Button
-                                              variant=""
-                                              className=""
-                                              onClick={(e)=>{
-                                                e.preventDefault();
-                                                const url2="https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/DoctorInActive"
+                                            const n={
+                                              Doctorid:docList.DoctorID
+                                             }
 
-                                                const n={
-                                                  Doctorid:docList.DoctorID
-                                                 }
-  
-                                                  console.log(n);
-                                                fetch(url2,{
-                                                        method:"POST",
-                                                        headers:{
-                                                          Accept: "application/json",
-                                                          'Content-Type': 'application/json'
-                                                        },
-                                                        body: JSON.stringify(n)
-                                                      })
-                                                      .then((res)=>res.json())
-                                                      .then((result)=>{
-                                                        console.log(result);
-                                                   
-                                                      })
+                                            fetch(url2,{
+                                              method:"POST",
+                                              headers:{
+                                                Accept: "application/json",
+                                                'Content-Type': 'application/json'
+                                              },
+                                              body: JSON.stringify(n)
+                                            })
+                                            .then((res)=>res.json())
+                                            .then((result)=>{
+                                              console.log(result);
+                                            })
 
-                                                      window.location.reload();
-
-                                              }}
-                                            >
-                                              <FaTrash/>
-                                            </Button>
-                                          </span>
-                                        </th>
-                                      </tr>
-                                    </>
-                                  );
-                                })
-                              : data.map((docList, index) => {
-                                  return (
-                                    <>
-                                      <tr id="tblrw">
-                                        {/* <th contenteditable="false" className="">1</th> */}
-                                        <td contenteditable="false">
-                                          {docList.DoctorID}
-                                        </td>
-                                        <td contenteditable="false">
-                                          {docList.Name}
-                                        </td>
-                                        <td contenteditable="false">1</td>
-                                        <td contenteditable="false">
-                                          {docList.PracticeName}
-                                        </td>
-                                        <td contenteditable="false">
-                                          {docList.PracticeEmail}
-                                        </td>
-                                        <td contenteditable="false">
-                                          {docList.PhoneNo}
-                                        </td>
-                                        <td contenteditable="false" id="stat" className={`${docList.isActive==="True"?"stat-green":"stat-red"}`}>{docList.isActive==="True"?"Active":"Inactive"}</td>
-                                        <th>
-                                          <span>
-                                            <Button
-                                              variant=""
-                                              className="action-i"
-                                              onClick={()=>navigate(`/doctor-profile/${docList.DoctorID}`)}
-                                            >
-                                              <IoEyeOutline color="black" />
-                                            </Button>
-                                          </span>
-                                          {/* <span><Button variant="" className="action-i add"><FaPlus color="black"/></Button></span> */}
-                                          {/* <span>
-                                            <Button
-                                              variant=""
-                                              className=""
-                                              onClick={()=>{navigate(`/payment/${docList.DoctorID}`)
-                                              sessionStorage.setItem("DocID",docList.DoctorID)
-                                              }}
-                                            >
-                                              <HiCurrencyRupee fontSize={20}/>
-                                            </Button>
-                                          </span> */}
-                                          <span>
-                                            <Button
-                                              variant=""
-                                              className=""
-                                              onClick={(e)=>{
-                                               
-                                                e.preventDefault();
-                                                const url2="https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/DoctorInActive"
-
-                                               const n={
-                                                Doctorid:docList.DoctorID
-                                               }
-
-                                                console.log(n);
-
-                                                fetch(url2,{
-                                                        method:"POST",
-                                                        headers:{
-                                                          Accept: "application/json",
-                                                          'Content-Type': 'application/json'
-                                                        },
-                                                        body: JSON.stringify(n)
-                                                      })
-                                                      .then((res)=>res.json())
-                                                      .then((result)=>{
-                                                        console.log(result);
-                                                   
-                                                      })
-                                                      window.location.reload();
-
-                                              }}
-                                            >
-                                              <FaTrash/>
-                                            </Button>
-                                          </span>
-                                        </th>
-                                      </tr>
-                                    </>
-                                  );
-                                })}
+                                            window.location.reload();
+                                          }}
+                                        >
+                                          <FaTrash/>
+                                        </Button>
+                                      </span>
+                                    </th>
+                                  </tr>
+                                </React.Fragment>
+                              );
+                            })}
 
                             {/* <tr>
                                               <td>2</td>

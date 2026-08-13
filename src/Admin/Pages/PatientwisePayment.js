@@ -58,13 +58,14 @@ const ID=urlParams.DoctorUserId;
       sortable: true,
     },
     {
-      name: "CaseNo",
-      selector: (row) => row.CaseNo,
+      name: "Name",
+      selector: (row) => row.Name,
       sortable: true,
     },
     {
-      name: "Name",
-      selector: (row) => row.Name,
+      name: "CaseNo",
+      selector: (row) => row.CaseNo,
+      sortable: true,
     },
     // {
     //   name: "Reg. Date",
@@ -125,8 +126,14 @@ const ID=urlParams.DoctorUserId;
   }, []);
 
   useEffect(() => {
-    const result = patient.filter((patientname) => {
-      return patientname.Name.toLowerCase().match(search.toLowerCase());
+    const result = patient.filter((item) => {
+      const s = search.toLowerCase();
+      return (
+        (item.PatientId?.toString() || "").toLowerCase().includes(s) ||
+        (item.CaseNo || "").toLowerCase().includes(s) ||
+        (item.Name || "").toLowerCase().includes(s) ||
+        (item.DoctorName || "").toLowerCase().includes(s)
+      );
     });
     setFilteredNames(result);
   }, [search]);
@@ -251,7 +258,7 @@ let DoctorName=sessionStorage.getItem("DocPracName");
                       <input
                         type="text"
                         className="w-25 form-control mt-4 mb-4"
-                        placeholder="Search by Name"
+                        placeholder="Search by Code, Name, Case No..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                       ></input>

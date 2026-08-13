@@ -124,6 +124,18 @@ const [totalLower, setTotalLower] = useState(0);
 const [columnDefs, setColumnDefs] = useState([
    
   {
+    headerName: "Patient Code",
+    field: "PatientId",
+    floatingFilter: true,
+    filter: "agTextColumnFilter",
+  },
+  {
+    headerName: "Patient Name",
+    field: "Name",
+    filter: "agTextColumnFilter",
+    floatingFilter: true,
+  },
+  {
     field: "CaseNo",
     floatingFilter:true,
     filter: "agTextColumnFilter",
@@ -131,13 +143,6 @@ const [columnDefs, setColumnDefs] = useState([
     //   buttons: ["reset", "apply"],
     // },
   },
-  { headerName:"Patient Name",field: "Name", filter: "agTextColumnFilter",
-  // filterParams: {
-  //   buttons: ["reset", "apply"],
-  // },
-  floatingFilter:true,
-
-},
   { headerName:"Clinic Name",field: "ClinicName", filter: "agTextColumnFilter",
   // filterParams: {
   //   buttons: ["reset", "apply"],

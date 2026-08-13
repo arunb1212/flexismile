@@ -133,16 +133,20 @@ function AlloactedSetsList() {
 
   const columns = [
     {
+      name: "Patient Code",
+      selector: (row) => row.PatientId,
+      sortable: true,
+    },
+    {
+      name: "Patient Name",
+      selector: (row) => row.Name,
+      sortable: true,
+    },
+    {
       name: "Case Paper No.",
       selector: (row) => row.CaseNo,
       sortable: true,
       // center:true,
-    },
-    {
-      id:"center",
-      name: "Patient Name",
-      selector: (row) => row.Name,
-      sortable: true,
     },
     {
       id:"center",
@@ -704,8 +708,13 @@ function AlloactedSetsList() {
    })
   }
   useEffect(() => {
-    const result = setsDetails.filter((patientname) => {
-      return patientname.Name.toLowerCase().match(search.toLowerCase());
+    const result = setsDetails.filter((item) => {
+      const s = search.toLowerCase();
+      return (
+        (item.PatientId?.toString() || "").toLowerCase().includes(s) ||
+        (item.CaseNo || "").toLowerCase().includes(s) ||
+        (item.Name || "").toLowerCase().includes(s)
+      );
     });
     setFilteredNames(result);
   }, [search]);
@@ -840,7 +849,7 @@ function AlloactedSetsList() {
                     <input
                       type="text"
                       className="w-25 form-control mt-4 mb-4"
-                      placeholder="Search by Name"
+                      placeholder="Search by Code, Name, Case No..."
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                     ></input>
