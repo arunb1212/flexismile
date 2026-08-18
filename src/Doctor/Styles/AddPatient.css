@@ -47,7 +47,18 @@ overflow-x: hidden;
 
 .crd-up{
     height: 8em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1.5px dashed #c49358;
+    background-color: #fcfbfa;
+    transition: all 0.2s ease-in-out;
+}
 
+.crd-up:hover {
+    background-color: #f7efe6;
+    border-color: #077396;
 }
 
 .img-s{
@@ -127,7 +138,19 @@ border: 1px solid black;
 
 
 .crd-up2{
- height: 25em;   
+    height: 25em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1.5px dashed #c49358;
+    background-color: #fcfbfa;
+    transition: all 0.2s ease-in-out;
+}
+
+.crd-up2:hover {
+    background-color: #f7efe6;
+    border-color: #077396;
 }
 
 

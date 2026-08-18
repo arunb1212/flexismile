@@ -167,22 +167,35 @@ var intra = document.getElementById("IntraNow");
 
 const IndividualUpload1=async ()=>{
   const fd=new FormData();
+  const extraElem = document.getElementById("ExtraNow");
 
-  if (extra.checked) {
+  if (extraElem && extraElem.checked) {
+    if (!state6) {
+      Swal.fire({
+        title: "Please select an image first!",
+        icon: "warning"
+      });
+      return;
+    }
     fd.append("Name", state6.name);
     fd.append("fileContent", state6);
   }
-  else{
-    Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
+  else {
+    if (state6) {
+      if (extraElem) extraElem.checked = true;
+      fd.append("Name", state6.name);
+      fd.append("fileContent", state6);
+    } else {
+      Swal.fire({
+        title: "Select the Upload photos now button!",
+        icon: "warning"
+      });
+      return;
+    }
   }
   await axios
   .post(
-    "/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+    "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
     fd,
     {
       onUploadProgress: (ProgressEvent) => {
@@ -208,41 +221,63 @@ const IndividualUpload1=async ()=>{
 
     let conf1=document.getElementById("extim1")
     
-    if(res.data.status==="1"){Swal.fire({
-      title: `${state6.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  conf1.style.display="none"
-  setProgressE1(null);
-  }
+    if(res.data.status==="1"){
+      Swal.fire({
+        title: `${state6?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success"
+      });
+      if (conf1) conf1.style.display="none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error"
+      });
+    }
+    setProgressE1(null);
+  })
+  .catch((err) => {
+    console.error("Upload error:", err);
+    setProgressE1(null);
+    Swal.fire({
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error"
+    });
   });
-
-
-  
-
 }
 
 
 const IndividualUpload2=async ()=>{
   const fd=new FormData();
+  const extraElem = document.getElementById("ExtraNow");
 
-  if (extra.checked) {
+  if (extraElem && extraElem.checked) {
+    if (!state62) {
+      Swal.fire({
+        title: "Please select an image first!",
+        icon: "warning"
+      });
+      return;
+    }
     fd.append("Name", state62.name);
     fd.append("fileContent", state62);
   }
-  else{
-    Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
+  else {
+    if (state62) {
+      if (extraElem) extraElem.checked = true;
+      fd.append("Name", state62.name);
+      fd.append("fileContent", state62);
+    } else {
+      Swal.fire({
+        title: "Select the Upload photos now button!",
+        icon: "warning"
+      });
+      return;
+    }
   }
   await axios
   .post(
-    "/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+    "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
     fd,
     {
       onUploadProgress: (ProgressEvent) => {
@@ -265,43 +300,64 @@ const IndividualUpload2=async ()=>{
     setValues(pre=>{
       return{...pre,FrontalSmiling:res.data.path}
     })
-let conf2=document.getElementById("extim2")
-    if(res.data.status==="1"){Swal.fire({
-      title: `${state62.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  conf2.style.display="none"
-  setProgressE2(null);
-
-  }
+    let conf2=document.getElementById("extim2")
+    if(res.data.status==="1"){
+      Swal.fire({
+        title: `${state62?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success"
+      });
+      if (conf2) conf2.style.display="none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error"
+      });
+    }
+    setProgressE2(null);
+  })
+  .catch((err) => {
+    console.error("Upload error:", err);
+    setProgressE2(null);
+    Swal.fire({
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error"
+    });
   });
-
-
-  
-
 }
 
 const IndividualUpload3=async ()=>{
   const fd=new FormData();
+  const extraElem = document.getElementById("ExtraNow");
 
-  if (extra.checked) {
+  if (extraElem && extraElem.checked) {
+    if (!state65) {
+      Swal.fire({
+        title: "Please select an image first!",
+        icon: "warning"
+      });
+      return;
+    }
     fd.append("Name", state65.name);
     fd.append("fileContent", state65);
     console.log(state65);
   }
-  else{
-    Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
+  else {
+    if (state65) {
+      if (extraElem) extraElem.checked = true;
+      fd.append("Name", state65.name);
+      fd.append("fileContent", state65);
+    } else {
+      Swal.fire({
+        title: "Select the Upload photos now button!",
+        icon: "warning"
+      });
+      return;
+    }
   }
   await axios
   .post(
-    "/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+    "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
     fd,
     {
       onUploadProgress: (ProgressEvent) => {
@@ -327,44 +383,60 @@ const IndividualUpload3=async ()=>{
 
     let conf3=document.getElementById("extim3")
 
-    if(res.data.status==="1"){Swal.fire({
-      title: `${state65.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  conf3.style.display="none"
-  setProgressE3(null);
-
-  }
+    if(res.data.status==="1"){
+      Swal.fire({
+        title: `${state65?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success"
+      });
+      if (conf3) conf3.style.display="none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error"
+      });
+    }
+    setProgressE3(null);
+  })
+  .catch((err) => {
+    console.error("Upload error:", err);
+    setProgressE3(null);
+    Swal.fire({
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error"
+    });
   });
-
-
-  
-
 }
 
 
-
-      
-
-     
 const IndividualUpload4=async ()=>{
   const fd=new FormData();
+  const extraElem = document.getElementById("ExtraNow");
 
-  if (extra.checked) {
+  if (extraElem && extraElem.checked) {
+    if (!state67) {
+      Swal.fire({
+        title: "Please select an image first!",
+        icon: "warning"
+      });
+      return;
+    }
     fd.append("Name", state67.name);
     fd.append("fileContent", state67);
     console.log(state67);
-
   }
-  else{
-    Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
+  else {
+    if (state67) {
+      if (extraElem) extraElem.checked = true;
+      fd.append("Name", state67.name);
+      fd.append("fileContent", state67);
+    } else {
+      Swal.fire({
+        title: "Select the Upload photos now button!",
+        icon: "warning"
+      });
+      return;
+    }
   }
   await axios
   .post(
@@ -394,49 +466,62 @@ const IndividualUpload4=async ()=>{
 
     let conf4=document.getElementById("extim4")
 
-    if(res.data.status==="1"){Swal.fire({
-      title: `${state67.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  conf4.style.display="none"
-  setProgressE4(null);
-
-  }
+    if(res.data.status==="1"){
+      Swal.fire({
+        title: `${state67?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success"
+      });
+      if (conf4) conf4.style.display="none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error"
+      });
+    }
+    setProgressE4(null);
+  })
+  .catch((err) => {
+    console.error("Upload error:", err);
+    setProgressE4(null);
+    Swal.fire({
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error"
+    });
   });
-
-
 }
 
 
 
 // ---------------------------------------------------Intra Individual
 
-
-  
-
-  
-
-  
-
-  
-
 const IntraUpload1=async ()=>{
   const fd=new FormData();
+  const intraElem = document.getElementById("IntraNow");
 
-  if (intra.checked) {
+  if (intraElem && intraElem.checked) {
+    if (!state662) {
+      Swal.fire({
+        title: "Please select an image first!",
+        icon: "warning"
+      });
+      return;
+    }
     fd.append("Name", state662.name);
-  fd.append("fileContent", state662);
-
+    fd.append("fileContent", state662);
   }
-  else{
-    Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
+  else {
+    if (state662) {
+      if (intraElem) intraElem.checked = true;
+      fd.append("Name", state662.name);
+      fd.append("fileContent", state662);
+    } else {
+      Swal.fire({
+        title: "Select the Upload photos now button!",
+        icon: "warning"
+      });
+      return;
+    }
   }
   await axios
   .post(
@@ -466,39 +551,59 @@ const IntraUpload1=async ()=>{
 
     let confint1=document.getElementById("intim1")
 
-    if(res.data.status==="1"){Swal.fire({
-      title: `${state662.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  confint1.style.display="none"
-  setProgressI1(null);
-
-  }
+    if(res.data.status==="1"){
+      Swal.fire({
+        title: `${state662?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success"
+      });
+      if (confint1) confint1.style.display="none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error"
+      });
+    }
+    setProgressI1(null);
+  })
+  .catch((err) => {
+    console.error("Upload error:", err);
+    setProgressI1(null);
+    Swal.fire({
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error"
+    });
   });
-
-
 }
-
-
 
 
 const IntraUpload2=async ()=>{
   const fd=new FormData();
+  const intraElem = document.getElementById("IntraNow");
 
-  if (intra.checked) {
+  if (intraElem && intraElem.checked) {
+    if (!state6621) {
+      Swal.fire({
+        title: "Please select an image first!",
+        icon: "warning"
+      });
+      return;
+    }
     fd.append("Name", state6621.name);
     fd.append("fileContent", state6621);
-
   }
-  else{
-    Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
+  else {
+    if (state6621) {
+      if (intraElem) intraElem.checked = true;
+      fd.append("Name", state6621.name);
+      fd.append("fileContent", state6621);
+    } else {
+      Swal.fire({
+        title: "Select the Upload photos now button!",
+        icon: "warning"
+      });
+      return;
+    }
   }
   await axios
   .post(
@@ -528,38 +633,59 @@ const IntraUpload2=async ()=>{
 
     let confint2=document.getElementById("intim2")
 
-    if(res.data.status==="1"){Swal.fire({
-      title: `${state6621.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  confint2.style.display="none"
-  setProgressI2(null);
-
-  }
+    if(res.data.status==="1"){
+      Swal.fire({
+        title: `${state6621?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success"
+      });
+      if (confint2) confint2.style.display="none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error"
+      });
+    }
+    setProgressI2(null);
+  })
+  .catch((err) => {
+    console.error("Upload error:", err);
+    setProgressI2(null);
+    Swal.fire({
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error"
+    });
   });
-
-
 }
-
 
 
 const IntraUpload3=async ()=>{
   const fd=new FormData();
+  const intraElem = document.getElementById("IntraNow");
 
-  if (intra.checked) {
+  if (intraElem && intraElem.checked) {
+    if (!state6622) {
+      Swal.fire({
+        title: "Please select an image first!",
+        icon: "warning"
+      });
+      return;
+    }
     fd.append("Name", state6622.name);
     fd.append("fileContent", state6622);
-
   }
-  else{
-    Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
+  else {
+    if (state6622) {
+      if (intraElem) intraElem.checked = true;
+      fd.append("Name", state6622.name);
+      fd.append("fileContent", state6622);
+    } else {
+      Swal.fire({
+        title: "Select the Upload photos now button!",
+        icon: "warning"
+      });
+      return;
+    }
   }
   await axios
   .post(
@@ -584,41 +710,62 @@ const IntraUpload3=async ()=>{
     var arr = res.data;
     console.log(arr);
     setValues(pre=>{
-            return{...pre,BuccalFront:res.data.path}
-          })
-let confint3=document.getElementById("intim3")
-          if(res.data.status==="1"){Swal.fire({
-            title: `${state6622.name} \nUploaded Successfully!`,
-            // text: 'Do you want to continue',
-            icon: "success"
-            // confirmButtonText: 'Cool'
-          })
-        confint3.style.display="none"
-        setProgressI3(null);
-
-        }
+      return{...pre,BuccalFront:res.data.path}
+    })
+    let confint3=document.getElementById("intim3")
+    if(res.data.status==="1"){
+      Swal.fire({
+        title: `${state6622?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success"
+      });
+      if (confint3) confint3.style.display="none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error"
+      });
+    }
+    setProgressI3(null);
+  })
+  .catch((err) => {
+    console.error("Upload error:", err);
+    setProgressI3(null);
+    Swal.fire({
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error"
+    });
   });
-
-
 }
-
 
 
 const IntraUpload4=async ()=>{
   const fd=new FormData();
+  const intraElem = document.getElementById("IntraNow");
 
-  if (intra.checked) {
+  if (intraElem && intraElem.checked) {
+    if (!state6623) {
+      Swal.fire({
+        title: "Please select an image first!",
+        icon: "warning"
+      });
+      return;
+    }
     fd.append("Name", state6623.name);
     fd.append("fileContent", state6623);
-
   }
-  else{
-    Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
+  else {
+    if (state6623) {
+      if (intraElem) intraElem.checked = true;
+      fd.append("Name", state6623.name);
+      fd.append("fileContent", state6623);
+    } else {
+      Swal.fire({
+        title: "Select the Upload photos now button!",
+        icon: "warning"
+      });
+      return;
+    }
   }
   await axios
   .post(
@@ -648,39 +795,60 @@ const IntraUpload4=async ()=>{
 
     let confint4=document.getElementById("intim4")
 
-    if(res.data.status==="1"){Swal.fire({
-      title: `${state6623.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  confint4.style.display="none"
-setProgressI4(null);
-
-  }
+    if(res.data.status==="1"){
+      Swal.fire({
+        title: `${state6623?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success"
+      });
+      if (confint4) confint4.style.display="none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error"
+      });
+    }
+    setProgressI4(null);
+  })
+  .catch((err) => {
+    console.error("Upload error:", err);
+    setProgressI4(null);
+    Swal.fire({
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error"
+    });
   });
-
-
 }
-
 
 
 const IntraUpload5=async ()=>{
   const fd=new FormData();
+  const intraElem = document.getElementById("IntraNow");
 
-  if (intra.checked) {
+  if (intraElem && intraElem.checked) {
+    if (!state6624) {
+      Swal.fire({
+        title: "Please select an image first!",
+        icon: "warning"
+      });
+      return;
+    }
     fd.append("Name", state6624.name);
     fd.append("fileContent", state6624);
     console.log(state6624);
-  
   }
-  else{
-    Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
+  else {
+    if (state6624) {
+      if (intraElem) intraElem.checked = true;
+      fd.append("Name", state6624.name);
+      fd.append("fileContent", state6624);
+    } else {
+      Swal.fire({
+        title: "Select the Upload photos now button!",
+        icon: "warning"
+      });
+      return;
+    }
   }
   await axios
   .post(
@@ -710,19 +878,29 @@ const IntraUpload5=async ()=>{
 
     let confint5=document.getElementById("intim5")
 
-    if(res.data.status==="1"){Swal.fire({
-      title: `${state6624.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  confint5.style.display="none"
-  setProgressI5(null);
-
-  }
+    if(res.data.status==="1"){
+      Swal.fire({
+        title: `${state6624?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success"
+      });
+      if (confint5) confint5.style.display="none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error"
+      });
+    }
+    setProgressI5(null);
+  })
+  .catch((err) => {
+    console.error("Upload error:", err);
+    setProgressI5(null);
+    Swal.fire({
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error"
+    });
   });
-
-
 }
 
 
@@ -730,20 +908,32 @@ const IntraUpload5=async ()=>{
 
 const RadioUpload1=async ()=>{
   const fd=new FormData();
+  const radGarph1Elem = document.getElementById("radGarph1");
 
-  if (radGarph1.checked) {
+  if (radGarph1Elem && radGarph1Elem.checked) {
+    if (!radio) {
+      Swal.fire({
+        title: "Please select a file first!",
+        icon: "warning"
+      });
+      return;
+    }
     fd.append("Name", radio.name);
-  fd.append("fileContent", radio);
-  console.log(radio);
-  
+    fd.append("fileContent", radio);
+    console.log(radio);
   }
-  else{
-    Swal.fire({
-      title: "Select the Upload Radiographs now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
+  else {
+    if (radio) {
+      if (radGarph1Elem) radGarph1Elem.checked = true;
+      fd.append("Name", radio.name);
+      fd.append("fileContent", radio);
+    } else {
+      Swal.fire({
+        title: "Select the Upload Radiographs now button!",
+        icon: "warning"
+      });
+      return;
+    }
   }
   await axios
   .post(
@@ -770,38 +960,59 @@ const RadioUpload1=async ()=>{
 
     let confrim1=document.getElementById("rim1");
 
-    if(res.data.status==="1"){Swal.fire({
-      title: `${radio.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  confrim1.style.display="none"
-  }
+    if(res.data.status==="1"){
+      Swal.fire({
+        title: `${radio?.name || "File"} \nUploaded Successfully!`,
+        icon: "success"
+      });
+      if (confrim1) confrim1.style.display="none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error"
+      });
+    }
+  })
+  .catch((err) => {
+    console.error("Upload error:", err);
+    Swal.fire({
+      title: "Failed to upload file!",
+      text: err.message,
+      icon: "error"
+    });
   });
-
-
 }
 
 
 
 const RadioUpload2=async ()=>{
   const fd=new FormData();
+  const radGarph1Elem = document.getElementById("radGarph1");
 
-  if (radGarph1.checked) {
-    
-  fd.append("Name", radio1.name);
-  fd.append("fileContent", radio1);
-  console.log(radio1);
-  
+  if (radGarph1Elem && radGarph1Elem.checked) {
+    if (!radio1) {
+      Swal.fire({
+        title: "Please select a file first!",
+        icon: "warning"
+      });
+      return;
+    }
+    fd.append("Name", radio1.name);
+    fd.append("fileContent", radio1);
+    console.log(radio1);
   }
-  else{
-    Swal.fire({
-      title: "Select the Upload Radiographs now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
+  else {
+    if (radio1) {
+      if (radGarph1Elem) radGarph1Elem.checked = true;
+      fd.append("Name", radio1.name);
+      fd.append("fileContent", radio1);
+    } else {
+      Swal.fire({
+        title: "Select the Upload Radiographs now button!",
+        icon: "warning"
+      });
+      return;
+    }
   }
   await axios
   .post(
@@ -828,17 +1039,27 @@ const RadioUpload2=async ()=>{
 
     let confrim2=document.getElementById("rim2");
 
-    if(res.data.status==="1"){Swal.fire({
-      title: `${radio1.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  confrim2.style.display="none"
-  }
+    if(res.data.status==="1"){
+      Swal.fire({
+        title: `${radio1?.name || "File"} \nUploaded Successfully!`,
+        icon: "success"
+      });
+      if (confrim2) confrim2.style.display="none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error"
+      });
+    }
+  })
+  .catch((err) => {
+    console.error("Upload error:", err);
+    Swal.fire({
+      title: "Failed to upload file!",
+      text: err.message,
+      icon: "error"
+    });
   });
-
-
 }
 
 
@@ -881,12 +1102,35 @@ const addUploadVideo = async (newarr) => {
           icon: "success",
           title: "Videos uploaded successfully!",
         });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: res.data?.message || "Failed to save video!",
+        });
       }
+      setVideoProgress(null);
+    })
+    .catch((err) => {
+      console.error("Video save error:", err);
+      setVideoProgress(null);
+      Swal.fire({
+        icon: "error",
+        title: "Failed to save video",
+        text: err.message
+      });
     });
 };
 
 const uploadHandlerVideo = async (e) => {
   e.preventDefault();
+
+  if (!videoFiles || videoFiles.length === 0) {
+    Swal.fire({
+      icon: "warning",
+      title: "Please select video file(s) first!",
+    });
+    return;
+  }
 
   const fd = new FormData();
   fd.append("PatientId", values.PatientId);
@@ -918,10 +1162,23 @@ const uploadHandlerVideo = async (e) => {
       console.log("below is arr");
       console.log(res.data.data);
       let arr = res.data.data;
-      let newarr = arr.map(({ imageurl }) => imageurl);
-      console.log(newarr);
-      let n = { PatientId: values.PatientId, CreateId: DoctorUserID, VideoPath: newarr, DoctorUploadingVideo: DoctorUploadingVideo };
-      addUploadVideo(n);
+      if (arr && Array.isArray(arr)) {
+        let newarr = arr.map(({ imageurl }) => imageurl);
+        console.log(newarr);
+        let n = { PatientId: values.PatientId, CreateId: DoctorUserID, VideoPath: newarr, DoctorUploadingVideo: DoctorUploadingVideo };
+        addUploadVideo(n);
+      } else {
+        setVideoProgress(null);
+      }
+    })
+    .catch((err) => {
+      console.error("Video upload error:", err);
+      setVideoProgress(null);
+      Swal.fire({
+        icon: "error",
+        title: "Video upload failed",
+        text: err.message
+      });
     });
 };
 
@@ -1089,7 +1346,7 @@ const uploadHandlerIpr = async () => {
 
     
 
-    await fetch("/FlexismileApiNew/FlexAlign.svc/AddPatientPlan", {
+    await fetch(url1, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -2379,96 +2636,159 @@ const urlParams = useParams();
 useEffect(() => {
   console.log(urlParams);
 
+  // Reset all uploaded file states and preview states when plan changes
+  setState(null);
+  setState6(null);
+  setState61(null);
+  setState62(null);
+  setState63(null);
+  setState64(null);
+  setState65(null);
+  setState66(null);
+  setState67(null);
+  setstate662(null);
+  setstate6621(null);
+  setstate6622(null);
+  setstate6623(null);
+  setstate6624(null);
+  setRadio(null);
+  setRadio1(null);
+  setImage(null);
+  setImageTab61(null);
+  setImage1(null);
+  setImage2(null);
+  setImage3(null);
+  setImage4(null);
+  setImage5(null);
+  setImage6(null);
+  setImage7(null);
+  setImage662(null);
+  setImage6621(null);
+  setImage6622(null);
+  setImage6623(null);
+  setImage6624(null);
+  setImageTab71(null);
+  setImageTab72(null);
+  setPreviewUrl("");
+  setPreviewUrlTab61("");
+  setPreviewUrl1("");
+  setPreviewUrl2("");
+  setPreviewUrl3("");
+  setPreviewUrl4("");
+  setPreviewUrl5("");
+  setPreviewUrl6("");
+  setPreviewUrl7("");
+  setPreviewUrl62("");
+  setPreviewUrl21("");
+  setPreviewUrl22("");
+  setPreviewUrl23("");
+  setPreviewUrl24("");
+  setPreviewUrlTab71("");
+  setPreviewUrlTab72("");
+  setAdd("");
+  setAddExtraO("");
+  setVideoFiles(undefined);
+  setVideoProgress(null);
+  setDoctorUploadingVideo("");
+  setRequiredIPR("");
+  setIPR(null);
+  setPVS("");
+  setIntraOral("");
+  setModels("");
+  setProgressE1(null);
+  setProgressE2(null);
+  setProgressE3(null);
+  setProgressE4(null);
+  setProgressI1(null);
+  setProgressI2(null);
+  setProgressI3(null);
+  setProgressI4(null);
+  setProgressI5(null);
+
   fetch(urlToData)
     .then((res) => res.json())
     .then((details) => {
       console.log(details.Data);
-      // console.log(details.Data[0]?.DoctorID);
       setPatient(details.Data);
-      let bDate=details.Data[0]?.DateofBirth.split(" ")[0];
-      console.log(bDate.split("/")[2]);
-      // let arryr=bDate.split("/")[2]
-      // let arr=[bDate.split('/')[0],bDate.split('/')[1],arryr].join('/')
-      // console.log(arr);
+      let bDate = details.Data[0]?.DateofBirth ? details.Data[0]?.DateofBirth.split(" ")[0] : "";
+      console.log(bDate);
 
-      // console.log(details.Data[0]?.ClinicalConditions.split(',').includes("Crowding")?"true":"false");
-      let cliCon=details.Data[0]?.ClinicalConditions.split(',')
-      console.log("clinical con");
-      console.log(cliCon);
-      // console.log(patient);
-      let doNot=details.Data[0]?.DoNotMoveTheseTeeth.split(',')
-      // console.log(doNot);
-      let extLater=details.Data[0]?.IWillExtractTheseTeethBeforeTreatment.split(',')
-      // console.log(extLater);
-      let leaveSpace=details.Data[0]?.LeaveTheseSpacesOpen.split(',')
-      // console.log(leaveSpace);
-      let engager=details.Data[0]?.AvidEngagersAttachmentsOnTheseTeeth.split(',')
-      console.log(engager);
-      setValues(pre=>{
-        return{...pre,PatientId:ID,
-          DoctorId:details.Data[0]?.DoctorID,
-        FirstName:details.Data[0]?.Name.split(' ')[0],
-        LastName:details.Data[0]?.Name.split(' ')[1],
-        Mi:details.Data[0]?.Mi,
-        Gender:details.Data[0]?.Gender,
-        DateofBirth:details.Data[0]?.DateofBirth,
-        DoctorName:details.Data[0]?.DoctorName,
-        ClinicAddress:details.Data[0]?.ClinicAddress,
-        CaseNo:details.Data[0]?.CaseNo,
-        ClinicalConditions:cliCon,
-        GeneralNotes:details.Data[0]?.GeneralNotes,
-        ChiefComplaint:details.Data[0]?.ChiefComplaint,
-        Quotation:details.Data[0]?.Quotation,
-        ExpectedNoOfAligners:details.Data[0]?.ExpectedNoOfAligners,
-        ProductType:details.Data[0]?.ProductType,
-        AmountPaid:details.Data[0]?.AmountPaid,
-        PrescriptionDate:details.Data[0]?.PrescriptionDate,
-        // UpperMidline:details.Data[0]?.
-        // LowerMidline:
-        CanineRelationshipLeftClass:details.Data[0]?.CanineRelationshipLeftClass,
-        CanineRelationshipRightClass:details.Data[0]?.CanineRelationshipRightClass,
-        MolarRelationshipLeftClass:details.Data[0]?.MolarRelationshipLeftClass,
-        MolarRelationshipRightClass:details.Data[0]?.MolarRelationshipRightClass,
-        Endon:details.Data[0]?.Endon,
-        Overbite:details.Data[0]?.Overbite,
-        Overjet:details.Data[0]?.Overjet,
-        InstructionUpperMidline:details.Data[0]?.InstructionUpperMidline,
-        InstructionLowerMidline:details.Data[0]?.InstructionLowerMidline,
-        InstructionOverjet:details.Data[0]?.InstructionOverjet,
-        InstructionOverbite:details.Data[0]?.InstructionOverbite,
-        InstructionArchForm:details.Data[0]?.InstructionArchForm,
-        InstructionCanineRelationship:details.Data[0]?.InstructionCanineRelationship,
-        InstructionMolarRelationship:details.Data[0]?.InstructionMolarRelationship,
-        InstructionPosteriorCrossbite:details.Data[0]?.InstructionPosteriorCrossbite,
-        InstructionIPR:details.Data[0]?.InstructionIPR,
-        InstructionEngagersAttachments:details.Data[0]?.InstructionEngagersAttachments,
-        InstructionProcline:details.Data[0]?.InstructionProcline,
-        InstructionExpand:details.Data[0]?.InstructionExpand,
-        InstructionDistalize:details.Data[0]?.InstructionDistalize,
-        DoNotMoveTheseTeeth:doNot,
-        AvidEngagersAttachmentsOnTheseTeeth:engager,
-        IWillExtractTheseTeethBeforeTreatment:extLater,
-        LeaveTheseSpacesOpen:leaveSpace,
-        AdditionalInstruction:details.Data[0]?.AdditionalInstruction,
-        PortraitPath:details.Data[0]?.PortraitPath,
-        PathOfDoc:details.Data[0]?.PathOfDoc,
-        FrontalRepose:details.Data[0]?.FrontalRepose,
-        FrontalSmiling:details.Data[0]?.FrontalSmiling,
-        ProfileRepose:details.Data[0]?.ProfileRepose,
-        FrontOpImage:details.Data[0]?.FrontOpImage,
-        OcclussalUpper:details.Data[0]?.OcclussalUpper,
-        OcclussalLower:details.Data[0]?.OcclussalLower,
-        BuccalFront:details.Data[0]?.BuccalFront,
-        // BuccalLeft:details.data[0]?.BuccalLeft,
-        BuccalRight:details.Data[0]?.BuccalRight,
-        // ExtraOralMoreImages:
-        // IntraOralMoreImages:
-        XrayLeft:details.Data[0]?.XrayLeft,
-        XrayRight:details.Data[0]?.XrayRight
-        }
-      })
-      console.log("Date "+values.DateofBirth);
-      // console.log(values.PatientId);
+      let cliCon = details.Data[0]?.ClinicalConditions ? details.Data[0]?.ClinicalConditions.split(',') : [];
+      console.log("clinical con", cliCon);
+      let doNot = details.Data[0]?.DoNotMoveTheseTeeth ? details.Data[0]?.DoNotMoveTheseTeeth.split(',') : [];
+      let extLater = details.Data[0]?.IWillExtractTheseTeethBeforeTreatment ? details.Data[0]?.IWillExtractTheseTeethBeforeTreatment.split(',') : [];
+      let leaveSpace = details.Data[0]?.LeaveTheseSpacesOpen ? details.Data[0]?.LeaveTheseSpacesOpen.split(',') : [];
+      let engager = details.Data[0]?.AvidEngagersAttachmentsOnTheseTeeth ? details.Data[0]?.AvidEngagersAttachmentsOnTheseTeeth.split(',') : [];
+
+      const isPlan1 = selectedPlan == 1 || selectedPlan === "1";
+
+      setValues((pre) => {
+        return {
+          ...pre,
+          PatientId: ID,
+          DoctorId: details.Data[0]?.DoctorID,
+          FirstName: details.Data[0]?.Name ? details.Data[0]?.Name.split(' ')[0] : "",
+          LastName: details.Data[0]?.Name ? details.Data[0]?.Name.split(' ')[1] : "",
+          Mi: details.Data[0]?.Mi || "",
+          Gender: details.Data[0]?.Gender || "",
+          DateofBirth: details.Data[0]?.DateofBirth || "",
+          DoctorName: details.Data[0]?.DoctorName || "",
+          ClinicAddress: details.Data[0]?.ClinicAddress || "",
+          CaseNo: details.Data[0]?.CaseNo || "",
+          ClinicalConditions: cliCon,
+          GeneralNotes: details.Data[0]?.GeneralNotes || "",
+          ChiefComplaint: details.Data[0]?.ChiefComplaint || "",
+          Quotation: details.Data[0]?.Quotation || "",
+          ExpectedNoOfAligners: details.Data[0]?.ExpectedNoOfAligners || "",
+          ProductType: details.Data[0]?.ProductType || "",
+          AmountPaid: details.Data[0]?.AmountPaid || "",
+          PrescriptionDate: details.Data[0]?.PrescriptionDate || "",
+          CanineRelationshipLeftClass: details.Data[0]?.CanineRelationshipLeftClass || "",
+          CanineRelationshipRightClass: details.Data[0]?.CanineRelationshipRightClass || "",
+          MolarRelationshipLeftClass: details.Data[0]?.MolarRelationshipLeftClass || "",
+          MolarRelationshipRightClass: details.Data[0]?.MolarRelationshipRightClass || "",
+          Endon: details.Data[0]?.Endon || "",
+          Overbite: details.Data[0]?.Overbite || "",
+          Overjet: details.Data[0]?.Overjet || "",
+          InstructionUpperMidline: details.Data[0]?.InstructionUpperMidline || "",
+          InstructionLowerMidline: details.Data[0]?.InstructionLowerMidline || "",
+          InstructionOverjet: details.Data[0]?.InstructionOverjet || "",
+          InstructionOverbite: details.Data[0]?.InstructionOverbite || "",
+          InstructionArchForm: details.Data[0]?.InstructionArchForm || "",
+          InstructionCanineRelationship: details.Data[0]?.InstructionCanineRelationship || "",
+          InstructionMolarRelationship: details.Data[0]?.InstructionMolarRelationship || "",
+          InstructionPosteriorCrossbite: details.Data[0]?.InstructionPosteriorCrossbite || "",
+          InstructionIPR: isPlan1 ? (details.Data[0]?.InstructionIPR || "") : "",
+          InstructionEngagersAttachments: details.Data[0]?.InstructionEngagersAttachments || "",
+          InstructionProcline: details.Data[0]?.InstructionProcline || "",
+          InstructionExpand: details.Data[0]?.InstructionExpand || "",
+          InstructionDistalize: details.Data[0]?.InstructionDistalize || "",
+          DoNotMoveTheseTeeth: doNot,
+          AvidEngagersAttachmentsOnTheseTeeth: engager,
+          IWillExtractTheseTeethBeforeTreatment: extLater,
+          LeaveTheseSpacesOpen: leaveSpace,
+          AdditionalInstruction: details.Data[0]?.AdditionalInstruction || "",
+          // Start with clean empty photo and radiograph slots for new treatment
+          PortraitPath: "",
+          PathOfDoc: [],
+          FrontalRepose: "",
+          FrontalSmiling: "",
+          ProfileRepose: "",
+          FrontOpImage: "",
+          OcclussalUpper: "",
+          OcclussalLower: "",
+          BuccalFront: "",
+          BuccalRight: "",
+          BuccalLeft: "",
+          ExtraOralMoreImages: [],
+          IntraOralMoreImages: [],
+          RadiographsType: "",
+          XrayLeft: "",
+          XrayRight: "",
+          PathVideo: "",
+          TypeOfPVSScan: "",
+        };
+      });
     });
 }, [selectedPlan]);
 
@@ -2828,46 +3148,66 @@ function formatDate(date) {
                                                   fileInputTab61.current.click()
                                                 }
                                               >
-                                                {previewUrlTab61 ? (
-                                                  previewUrlTab61 && (
+                                                {previewUrlTab61 || values.FrontalRepose ? (
+                                                  <div className="w-100 h-100 position-relative d-flex align-items-center justify-content-center">
                                                     <img
-                                                      src={previewUrlTab61}
-                                                      alt="image"
+                                                      src={previewUrlTab61 || values.FrontalRepose}
+                                                      alt="Frontal Repose"
                                                       className="img-s"
+                                                      style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "4px" }}
                                                     />
-                                                  )
+                                                    <span
+                                                      className="position-absolute bottom-0 start-0 end-0 text-center text-white py-1 px-1"
+                                                      style={{ background: "rgba(0,0,0,0.65)", fontSize: "11px", fontWeight: "600", borderBottomLeftRadius: "4px", borderBottomRightRadius: "4px" }}
+                                                    >
+                                                      Frontal Repose
+                                                    </span>
+                                                    <button
+                                                      type="button"
+                                                      title="Remove photo"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setPreviewUrlTab61("");
+                                                        setImageTab61(null);
+                                                        setState6(null);
+                                                        setValues((prev) => ({ ...prev, FrontalRepose: "" }));
+                                                        if (fileInputTab61.current) fileInputTab61.current.value = "";
+                                                      }}
+                                                      style={{
+                                                        position: "absolute",
+                                                        top: "4px",
+                                                        right: "4px",
+                                                        border: "none",
+                                                        background: "rgba(220, 53, 69, 0.9)",
+                                                        color: "#fff",
+                                                        borderRadius: "50%",
+                                                        width: "22px",
+                                                        height: "22px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        fontSize: "14px",
+                                                        lineHeight: "1",
+                                                        cursor: "pointer",
+                                                        zIndex: 10,
+                                                      }}
+                                                    >
+                                                      ×
+                                                    </button>
+                                                  </div>
                                                 ) : (
-                                                  <img
-                                                      src={patient[0]?.FrontalRepose}
-                                                      alt="image"
-                                                      className="img-s"
-                                                    />
+                                                  <div className="text-center text-muted p-2">
+                                                    <FaUpload className="mb-1" style={{ fontSize: "1.2rem", color: "#C49358" }} />
+                                                    <div style={{ fontSize: "12px", fontWeight: "600", color: "#333" }}>Frontal Repose</div>
+                                                    <div style={{ fontSize: "10px", color: "#888" }}>Click or drag photo</div>
+                                                  </div>
                                                 )}
                                               </Card>
                                               <span className="m-auto"><Button variant="" className="btn-outline-dark mt-1" onClick={IndividualUpload1}>Confirm</Button>{previewUrlTab61?<span id="extim1">Confirm to upload!</span>:""}</span>
                                               {progressE1 &&
-                      // <ProgressBar variant="success" className="m-2 mx-0" now={Progress} label={`${Progress}%`} min={0} max={100} style={{width:`${Progress}%`}}/>
                       <Spinner animation="border"/>
                       }
                                             </Col>
-                                            {/* <Col md={4}>
-                                              <Card
-                                                className="crd-up"
-                                                onDragOver={handleOndragOver}
-                                                onDrop={handleOndrop1}
-                                                onClick={() =>
-                                                  fileInput1.current.click()
-                                                }
-                                              >
-                                                {previewUrl1 && (
-                                                  <img
-                                                    src={previewUrl1}
-                                                    alt="image"
-                                                    className="img-s"
-                                                  />
-                                                )}
-                                              </Card>
-                                            </Col> */}
                                             <Col md={6}>
                                               <Card
                                                 className="crd-up"
@@ -2877,48 +3217,68 @@ function formatDate(date) {
                                                   fileInput2.current.click()
                                                 }
                                               >
-                                                {previewUrl2 ? (
-                                                  previewUrl2 && (
+                                                {previewUrl2 || values.FrontalSmiling ? (
+                                                  <div className="w-100 h-100 position-relative d-flex align-items-center justify-content-center">
                                                     <img
-                                                      src={previewUrl2}
-                                                      alt="image"
+                                                      src={previewUrl2 || values.FrontalSmiling}
+                                                      alt="Frontal Smiling"
                                                       className="img-s"
+                                                      style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "4px" }}
                                                     />
-                                                  )
+                                                    <span
+                                                      className="position-absolute bottom-0 start-0 end-0 text-center text-white py-1 px-1"
+                                                      style={{ background: "rgba(0,0,0,0.65)", fontSize: "11px", fontWeight: "600", borderBottomLeftRadius: "4px", borderBottomRightRadius: "4px" }}
+                                                    >
+                                                      Frontal Smiling
+                                                    </span>
+                                                    <button
+                                                      type="button"
+                                                      title="Remove photo"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setPreviewUrl2("");
+                                                        setImage2(null);
+                                                        setState62(null);
+                                                        setValues((prev) => ({ ...prev, FrontalSmiling: "" }));
+                                                        if (fileInput2.current) fileInput2.current.value = "";
+                                                      }}
+                                                      style={{
+                                                        position: "absolute",
+                                                        top: "4px",
+                                                        right: "4px",
+                                                        border: "none",
+                                                        background: "rgba(220, 53, 69, 0.9)",
+                                                        color: "#fff",
+                                                        borderRadius: "50%",
+                                                        width: "22px",
+                                                        height: "22px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        fontSize: "14px",
+                                                        lineHeight: "1",
+                                                        cursor: "pointer",
+                                                        zIndex: 10,
+                                                      }}
+                                                    >
+                                                      ×
+                                                    </button>
+                                                  </div>
                                                 ) : (
-                                                  <img
-                                                      src={patient[0]?.FrontalSmiling}
-                                                      alt="image"
-                                                      className="img-s"
-                                                    />
+                                                  <div className="text-center text-muted p-2">
+                                                    <FaUpload className="mb-1" style={{ fontSize: "1.2rem", color: "#C49358" }} />
+                                                    <div style={{ fontSize: "12px", fontWeight: "600", color: "#333" }}>Frontal Smiling</div>
+                                                    <div style={{ fontSize: "10px", color: "#888" }}>Click or drag photo</div>
+                                                  </div>
                                                 )}
                                               </Card>
                                               <span className="m-auto"><Button variant="" className="btn-outline-dark mt-1" onClick={IndividualUpload2}>Confirm</Button>{previewUrl2?<span id="extim2">Confirm to upload!</span>:""}</span>
                                               {progressE2 &&
-                      // <ProgressBar variant="success" className="m-2 mx-0" now={Progress} label={`${Progress}%`} min={0} max={100} style={{width:`${Progress}%`}}/>
                       <Spinner animation="border"/>
                       }
                                             </Col>
                                           </Row>
                                           <Row className="mt-4 justify-content-center">
-                                            {/* <Col md={4}>
-                                              <Card
-                                                className="crd-up"
-                                                onDragOver={handleOndragOver}
-                                                onDrop={handleOndrop3}
-                                                onClick={() =>
-                                                  fileInput3.current.click()
-                                                }
-                                              >
-                                                {previewUrl3 && (
-                                                  <img
-                                                    src={previewUrl3}
-                                                    alt="image"
-                                                    className="img-s"
-                                                  />
-                                                )}
-                                              </Card>
-                                            </Col> */}
                                             <Col md={4}>
                                               <Card className="border-0 p-2">
                                                 <p className="text-center">
@@ -2928,24 +3288,6 @@ function formatDate(date) {
                                                 </p>
                                               </Card>
                                             </Col>
-                                            {/* <Col md={4}>
-                                              <Card
-                                                className="crd-up"
-                                                onDragOver={handleOndragOver}
-                                                onDrop={handleOndrop4}
-                                                onClick={() =>
-                                                  fileInput4.current.click()
-                                                }
-                                              >
-                                                {previewUrl4 && (
-                                                  <img
-                                                    src={previewUrl4}
-                                                    alt="image"
-                                                    className="img-s"
-                                                  />
-                                                )}
-                                              </Card>
-                                            </Col> */}
                                           </Row>
                                           <Row className="mt-3">
                                             <Col md={6}>
@@ -2957,46 +3299,66 @@ function formatDate(date) {
                                                   fileInput5.current.click()
                                                 }
                                               >
-                                                {previewUrl5 ? (
-                                                  previewUrl5 && (
+                                                {previewUrl5 || values.ProfileRepose ? (
+                                                  <div className="w-100 h-100 position-relative d-flex align-items-center justify-content-center">
                                                     <img
-                                                      src={previewUrl5}
-                                                      alt="image"
+                                                      src={previewUrl5 || values.ProfileRepose}
+                                                      alt="Profile Repose"
                                                       className="img-s"
+                                                      style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "4px" }}
                                                     />
-                                                  )
+                                                    <span
+                                                      className="position-absolute bottom-0 start-0 end-0 text-center text-white py-1 px-1"
+                                                      style={{ background: "rgba(0,0,0,0.65)", fontSize: "11px", fontWeight: "600", borderBottomLeftRadius: "4px", borderBottomRightRadius: "4px" }}
+                                                    >
+                                                      Profile Repose
+                                                    </span>
+                                                    <button
+                                                      type="button"
+                                                      title="Remove photo"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setPreviewUrl5("");
+                                                        setImage5(null);
+                                                        setState65(null);
+                                                        setValues((prev) => ({ ...prev, ProfileRepose: "" }));
+                                                        if (fileInput5.current) fileInput5.current.value = "";
+                                                      }}
+                                                      style={{
+                                                        position: "absolute",
+                                                        top: "4px",
+                                                        right: "4px",
+                                                        border: "none",
+                                                        background: "rgba(220, 53, 69, 0.9)",
+                                                        color: "#fff",
+                                                        borderRadius: "50%",
+                                                        width: "22px",
+                                                        height: "22px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        fontSize: "14px",
+                                                        lineHeight: "1",
+                                                        cursor: "pointer",
+                                                        zIndex: 10,
+                                                      }}
+                                                    >
+                                                      ×
+                                                    </button>
+                                                  </div>
                                                 ) : (
-                                                   <img
-                                                      src={patient[0]?.ProfileRepose}
-                                                      alt="image"
-                                                      className="img-s"
-                                                    />
+                                                  <div className="text-center text-muted p-2">
+                                                    <FaUpload className="mb-1" style={{ fontSize: "1.2rem", color: "#C49358" }} />
+                                                    <div style={{ fontSize: "12px", fontWeight: "600", color: "#333" }}>Profile Repose</div>
+                                                    <div style={{ fontSize: "10px", color: "#888" }}>Click or drag photo</div>
+                                                  </div>
                                                 )}
                                               </Card>
                                               <span className="m-auto"><Button variant="" className="btn-outline-dark mt-1" onClick={IndividualUpload3}>Confirm</Button>{previewUrl5?<span id="extim3">Confirm to upload!</span>:""}</span>
                                               {progressE3 &&
-                      // <ProgressBar variant="success" className="m-2 mx-0" now={Progress} label={`${Progress}%`} min={0} max={100} style={{width:`${Progress}%`}}/>
                       <Spinner animation="border"/>
                       }
                                             </Col>
-                                            {/* <Col md={4}>
-                                              <Card
-                                                className="crd-up"
-                                                onDragOver={handleOndragOver}
-                                                onDrop={handleOndrop6}
-                                                onClick={() =>
-                                                  fileInput6.current.click()
-                                                }
-                                              >
-                                                {previewUrl6 && (
-                                                  <img
-                                                    src={previewUrl6}
-                                                    alt="image"
-                                                    className="img-s"
-                                                  />
-                                                )}
-                                              </Card>
-                                            </Col> */}
                                             <Col md={6}>
                                               <Card
                                                 className="crd-up"
@@ -3006,48 +3368,67 @@ function formatDate(date) {
                                                   fileInput7.current.click()
                                                 }
                                               >
-                                                {previewUrl7?previewUrl7 && (
-                                                  <img
-                                                    src={previewUrl7}
-                                                    alt="image"
-                                                    className="img-s"
-                                                  />
-                                                ):<img
-                                                src={patient[0]?.FrontOpImage}
-                                                alt="image"
-                                                className="img-s"
-                                              />}
+                                                {previewUrl7 || values.FrontOpImage ? (
+                                                  <div className="w-100 h-100 position-relative d-flex align-items-center justify-content-center">
+                                                    <img
+                                                      src={previewUrl7 || values.FrontOpImage}
+                                                      alt="Profile 45° / Other"
+                                                      className="img-s"
+                                                      style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "4px" }}
+                                                    />
+                                                    <span
+                                                      className="position-absolute bottom-0 start-0 end-0 text-center text-white py-1 px-1"
+                                                      style={{ background: "rgba(0,0,0,0.65)", fontSize: "11px", fontWeight: "600", borderBottomLeftRadius: "4px", borderBottomRightRadius: "4px" }}
+                                                    >
+                                                      Profile 45° / Other
+                                                    </span>
+                                                    <button
+                                                      type="button"
+                                                      title="Remove photo"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setPreviewUrl7("");
+                                                        setImage7(null);
+                                                        setState67(null);
+                                                        setValues((prev) => ({ ...prev, FrontOpImage: "" }));
+                                                        if (fileInput7.current) fileInput7.current.value = "";
+                                                      }}
+                                                      style={{
+                                                        position: "absolute",
+                                                        top: "4px",
+                                                        right: "4px",
+                                                        border: "none",
+                                                        background: "rgba(220, 53, 69, 0.9)",
+                                                        color: "#fff",
+                                                        borderRadius: "50%",
+                                                        width: "22px",
+                                                        height: "22px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        fontSize: "14px",
+                                                        lineHeight: "1",
+                                                        cursor: "pointer",
+                                                        zIndex: 10,
+                                                      }}
+                                                    >
+                                                      ×
+                                                    </button>
+                                                  </div>
+                                                ) : (
+                                                  <div className="text-center text-muted p-2">
+                                                    <FaUpload className="mb-1" style={{ fontSize: "1.2rem", color: "#C49358" }} />
+                                                    <div style={{ fontSize: "12px", fontWeight: "600", color: "#333" }}>Profile 45° / Other</div>
+                                                    <div style={{ fontSize: "10px", color: "#888" }}>Click or drag photo</div>
+                                                  </div>
+                                                )}
                                               </Card>
                                               <span className="m-auto"><Button variant="" className="btn-outline-dark mt-1" onClick={IndividualUpload4}>Confirm</Button>{previewUrl7?<span id="extim4">Confirm to upload!</span>:""}</span>
                                               {progressE4 &&
-                      // <ProgressBar variant="success" className="m-2 mx-0" now={Progress} label={`${Progress}%`} min={0} max={100} style={{width:`${Progress}%`}}/>
-                      <Spinner animation="border"/>
-                      }
+                                                <Spinner animation="border"/>
+                                              }
                                             </Col>
                                           </Row>
-                                          {/* {previewUrl ? (
-                ""
-                ) : (
-                <p className="text-center">
-                Drag or click to browse
-                </p>
-                )} */}
-                                          {/* {" "}
-                <br />
-                <Button
-                variant=""
-                onClick={() => {
-                setPreviewUrl("");
-                // e.stopPropagation();
-                }}
-                >
-                Delete
-                </Button>
-                <p> {image.name} </p>
-                </div>
-                )}
-              
-                } */}
                                         </Card>
                                         <Card
                                           className="desc border-0"
@@ -3058,31 +3439,16 @@ function formatDate(date) {
                                             <Col md={6}>
                                               <Card className="crd-up"></Card>
                                             </Col>
-                                            {/* <Col md={4}>
-                                              <Card className="crd-up"></Card>
-                                            </Col> */}
                                             <Col md={6}>
                                               <Card className="crd-up"></Card>
                                             </Col>
                                           </Row>
                                           <Row className="m-2">
-                                            {/* <Col md={4}>
-                                              <Card className="crd-up"></Card>
-                                            </Col>
-                                            <Col md={4}>
-                                              <Card className="crd-up"></Card>
-                                            </Col>
-                                            <Col md={4}>
-                                              <Card className="crd-up"></Card>
-                                            </Col> */}
                                           </Row>
                                           <Row className="m-2">
                                             <Col md={6}>
                                               <Card className="crd-up"></Card>
                                             </Col>
-                                            {/* <Col md={4}>
-                                              <Card className="crd-up"></Card>
-                                            </Col> */}
                                             <Col md={6}>
                                               <Card className="crd-up"></Card>
                                             </Col>
@@ -3140,9 +3506,6 @@ function formatDate(date) {
                                         <Card
                                           className="img-crd-in m-2 p-3 desc1"
                                           id="iPh1"
-                                          // onDragOver={handleOndragOver}
-                                          // onDrop={handleOndrop}
-                                          // onClick={() => fileInput.current.click()}
                                         >
                                           <input
                                             type="file"
@@ -3154,16 +3517,6 @@ function formatDate(date) {
                                               handleFile662(e.target.files[0])
                                             }
                                           />
-                                          {/* <input
-                                            type="file"
-                                            accept="image/*"
-                                            ref={fileInput1}
-                                            hidden
-                                            name="Name"
-                                            onChange={(e) =>
-                                              handleFile1(e.target.files[0])
-                                            }
-                                          /> */}
                                           <input
                                             type="file"
                                             accept="image/*"
@@ -3174,16 +3527,6 @@ function formatDate(date) {
                                               handleFile6621(e.target.files[0])
                                             }
                                           />
-                                          {/* <input
-                                            type="file"
-                                            accept="image/*"
-                                            ref={fileInput3}
-                                            hidden
-                                            name="Name"
-                                            onChange={(e) =>
-                                              handleFile3(e.target.files[0])
-                                            }
-                                          /> */}
                                           <input
                                             type="file"
                                             accept="image/*"
@@ -3194,16 +3537,6 @@ function formatDate(date) {
                                               handleFile6622(e.target.files[0])
                                             }
                                           />
-                                          {/* <input
-                                            type="file"
-                                            accept="image/*"
-                                            ref={fileInput5}
-                                            hidden
-                                            name="Name"
-                                            onChange={(e) =>
-                                              handleFile5(e.target.files[0])
-                                            }
-                                          /> */}
                                           <input
                                             type="file"
                                             accept="image/*"
@@ -3236,46 +3569,66 @@ function formatDate(date) {
                                                   fileInput62.current.click()
                                                 }
                                               >
-                                                {previewUrl62 ? (
-                                                  previewUrl62 && (
+                                                {previewUrl62 || values.BuccalRight ? (
+                                                  <div className="w-100 h-100 position-relative d-flex align-items-center justify-content-center">
                                                     <img
-                                                      src={previewUrl62}
-                                                      alt="image"
+                                                      src={previewUrl62 || values.BuccalRight}
+                                                      alt="Buccal Right"
                                                       className="img-s"
+                                                      style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "4px" }}
                                                     />
-                                                  )
+                                                    <span
+                                                      className="position-absolute bottom-0 start-0 end-0 text-center text-white py-1 px-1"
+                                                      style={{ background: "rgba(0,0,0,0.65)", fontSize: "11px", fontWeight: "600", borderBottomLeftRadius: "4px", borderBottomRightRadius: "4px" }}
+                                                    >
+                                                      Buccal Right
+                                                    </span>
+                                                    <button
+                                                      type="button"
+                                                      title="Remove photo"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setPreviewUrl62("");
+                                                        setImage662(null);
+                                                        setstate662(null);
+                                                        setValues((prev) => ({ ...prev, BuccalRight: "" }));
+                                                        if (fileInput62.current) fileInput62.current.value = "";
+                                                      }}
+                                                      style={{
+                                                        position: "absolute",
+                                                        top: "4px",
+                                                        right: "4px",
+                                                        border: "none",
+                                                        background: "rgba(220, 53, 69, 0.9)",
+                                                        color: "#fff",
+                                                        borderRadius: "50%",
+                                                        width: "22px",
+                                                        height: "22px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        fontSize: "14px",
+                                                        lineHeight: "1",
+                                                        cursor: "pointer",
+                                                        zIndex: 10,
+                                                      }}
+                                                    >
+                                                      ×
+                                                    </button>
+                                                  </div>
                                                 ) : (
-                                                  <img
-                                                      src={patient[0]?.BuccalRight}
-                                                      alt="image"
-                                                      className="img-s"
-                                                    />
+                                                  <div className="text-center text-muted p-2">
+                                                    <FaUpload className="mb-1" style={{ fontSize: "1.2rem", color: "#C49358" }} />
+                                                    <div style={{ fontSize: "12px", fontWeight: "600", color: "#333" }}>Buccal Right</div>
+                                                    <div style={{ fontSize: "10px", color: "#888" }}>Click or drag photo</div>
+                                                  </div>
                                                 )}
                                               </Card>
                                               <span className="m-auto"><Button variant="" className="btn-outline-dark mt-1" onClick={IntraUpload1}>Confirm</Button>{previewUrl62?<span id="intim1">Confirm to upload!</span>:""}</span>
                                               {progressI1 &&
-                      // <ProgressBar variant="success" className="m-2 mx-0" now={Progress} label={`${Progress}%`} min={0} max={100} style={{width:`${Progress}%`}}/>
                       <Spinner animation="border"/>
                       }
                                             </Col>
-                                            {/* <Col md={4}>
-                                              <Card
-                                                className="crd-up"
-                                                onDragOver={handleOndragOver}
-                                                onDrop={handleOndrop1}
-                                                onClick={() =>
-                                                  fileInput1.current.click()
-                                                }
-                                              >
-                                                {previewUrl1 && (
-                                                  <img
-                                                    src={previewUrl1}
-                                                    alt="image"
-                                                    className="img-s"
-                                                  />
-                                                )}
-                                              </Card>
-                                            </Col> */}
                                             <Col md={6}>
                                               <Card
                                                 className="crd-up"
@@ -3285,71 +3638,68 @@ function formatDate(date) {
                                                   fileInput21.current.click()
                                                 }
                                               >
-                                                {/* {previewUrl21 ? (
-                                                  previewUrl21 && (
+                                                {previewUrl21 || values.BuccalLeft ? (
+                                                  <div className="w-100 h-100 position-relative d-flex align-items-center justify-content-center">
                                                     <img
-                                                      src={previewUrl21}
-                                                      alt="image"
+                                                      src={previewUrl21 || values.BuccalLeft}
+                                                      alt="Buccal Left"
                                                       className="img-s"
+                                                      style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "4px" }}
                                                     />
-                                                  )
+                                                    <span
+                                                      className="position-absolute bottom-0 start-0 end-0 text-center text-white py-1 px-1"
+                                                      style={{ background: "rgba(0,0,0,0.65)", fontSize: "11px", fontWeight: "600", borderBottomLeftRadius: "4px", borderBottomRightRadius: "4px" }}
+                                                    >
+                                                      Buccal Left
+                                                    </span>
+                                                    <button
+                                                      type="button"
+                                                      title="Remove photo"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setPreviewUrl21("");
+                                                        setImage6621(null);
+                                                        setstate6621(null);
+                                                        setValues((prev) => ({ ...prev, BuccalLeft: "" }));
+                                                        if (fileInput21.current) fileInput21.current.value = "";
+                                                      }}
+                                                      style={{
+                                                        position: "absolute",
+                                                        top: "4px",
+                                                        right: "4px",
+                                                        border: "none",
+                                                        background: "rgba(220, 53, 69, 0.9)",
+                                                        color: "#fff",
+                                                        borderRadius: "50%",
+                                                        width: "22px",
+                                                        height: "22px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        fontSize: "14px",
+                                                        lineHeight: "1",
+                                                        cursor: "pointer",
+                                                        zIndex: 10,
+                                                      }}
+                                                    >
+                                                      ×
+                                                    </button>
+                                                  </div>
                                                 ) : (
-                                                  <p className="text-center mt-5">
-                                                    Front Buccal
-                                                  </p>
-                                                )} */}
-
-                                                {previewUrl21 ? (
-                                                  previewUrl21 && (
-                                                    <img
-                                                      src={previewUrl21}
-                                                      alt="image"
-                                                      className="img-s"
-                                                    />
-                                                  )
-                                                ) : (
-                                                  <img
-                                                  src={patient[0]?.BuccalLeft}
-                                                  alt="image"
-                                                  className="img-s"
-                                                />
+                                                  <div className="text-center text-muted p-2">
+                                                    <FaUpload className="mb-1" style={{ fontSize: "1.2rem", color: "#C49358" }} />
+                                                    <div style={{ fontSize: "12px", fontWeight: "600", color: "#333" }}>Buccal Left</div>
+                                                    <div style={{ fontSize: "10px", color: "#888" }}>Click or drag photo</div>
+                                                  </div>
                                                 )}
                                               </Card>
                                               <span className="m-auto"><Button variant="" className="btn-outline-dark mt-1" onClick={IntraUpload2}>Confirm</Button>{previewUrl21?<span id="intim2">Confirm to upload!</span>:""}</span>
                                               {progressI2 &&
-                      // <ProgressBar variant="success" className="m-2 mx-0" now={Progress} label={`${Progress}%`} min={0} max={100} style={{width:`${Progress}%`}}/>
                       <Spinner animation="border"/>
                       }
                                             </Col>
                                           </Row>
                                           <Row className="mt-3 justify-content-center">
-                                            {/* <Col md={4}>
-                                              <Card
-                                                className="crd-up"
-                                                onDragOver={handleOndragOver}
-                                                onDrop={handleOndrop3}
-                                                onClick={() =>
-                                                  fileInput3.current.click()
-                                                }
-                                              >
-                                                {previewUrl3 && (
-                                                  <img
-                                                    src={previewUrl3}
-                                                    alt="image"
-                                                    className="img-s"
-                                                  />
-                                                )}
-                                              </Card>
-                                            </Col> */}
-                                            {/* <Col md={6}>
-                                              <Card className="border-0 p-2">
-                                                <p className="text-center">
-                                                  Drag and drop individual photos
-                                                  from desktop folder to
-                                                  respective tile
-                                                </p>
-                                              </Card>
-                                            </Col> */}
                                             <Col md={6}>
                                               <Card
                                                 className="crd-up"
@@ -3359,39 +3709,63 @@ function formatDate(date) {
                                                   fileInput22.current.click()
                                                 }
                                               >
-                                                {/* {previewUrl22 ? (
-                                                  previewUrl22 && (
+                                                {previewUrl22 || values.BuccalFront ? (
+                                                  <div className="w-100 h-100 position-relative d-flex align-items-center justify-content-center">
                                                     <img
-                                                      src={previewUrl22}
-                                                      alt="image"
+                                                      src={previewUrl22 || values.BuccalFront}
+                                                      alt="Buccal Front"
                                                       className="img-s"
+                                                      style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "4px" }}
                                                     />
-                                                  )
+                                                    <span
+                                                      className="position-absolute bottom-0 start-0 end-0 text-center text-white py-1 px-1"
+                                                      style={{ background: "rgba(0,0,0,0.65)", fontSize: "11px", fontWeight: "600", borderBottomLeftRadius: "4px", borderBottomRightRadius: "4px" }}
+                                                    >
+                                                      Buccal Front
+                                                    </span>
+                                                    <button
+                                                      type="button"
+                                                      title="Remove photo"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setPreviewUrl22("");
+                                                        setImage6622(null);
+                                                        setstate6622(null);
+                                                        setValues((prev) => ({ ...prev, BuccalFront: "" }));
+                                                        if (fileInput22.current) fileInput22.current.value = "";
+                                                      }}
+                                                      style={{
+                                                        position: "absolute",
+                                                        top: "4px",
+                                                        right: "4px",
+                                                        border: "none",
+                                                        background: "rgba(220, 53, 69, 0.9)",
+                                                        color: "#fff",
+                                                        borderRadius: "50%",
+                                                        width: "22px",
+                                                        height: "22px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        fontSize: "14px",
+                                                        lineHeight: "1",
+                                                        cursor: "pointer",
+                                                        zIndex: 10,
+                                                      }}
+                                                    >
+                                                      ×
+                                                    </button>
+                                                  </div>
                                                 ) : (
-                                                  <p className="text-center mt-5">
-                                                    Left Buccal
-                                                  </p>
-                                                )} */}
-
-                                                {previewUrl22 ? (
-                                                  previewUrl22 && (
-                                                    <img
-                                                      src={previewUrl22}
-                                                      alt="image"
-                                                      className="img-s"
-                                                    />
-                                                  )
-                                                ) : (
-                                                  <img
-                                                      src={patient[0]?.BuccalFront}
-                                                      alt="image"
-                                                      className="img-s"
-                                                    />
+                                                  <div className="text-center text-muted p-2">
+                                                    <FaUpload className="mb-1" style={{ fontSize: "1.2rem", color: "#C49358" }} />
+                                                    <div style={{ fontSize: "12px", fontWeight: "600", color: "#333" }}>Buccal Front</div>
+                                                    <div style={{ fontSize: "10px", color: "#888" }}>Click or drag photo</div>
+                                                  </div>
                                                 )}
                                               </Card>
                                               <span className="m-auto"><Button variant="" className="btn-outline-dark mt-1" onClick={IntraUpload3}>Confirm</Button>{previewUrl22?<span id="intim3">Confirm to upload!</span>:""}</span>
                                               {progressI3 &&
-                      // <ProgressBar variant="success" className="m-2 mx-0" now={Progress} label={`${Progress}%`} min={0} max={100} style={{width:`${Progress}%`}}/>
                       <Spinner animation="border"/>
                       }
                                             </Col>
@@ -3406,54 +3780,66 @@ function formatDate(date) {
                                                   fileInput23.current.click()
                                                 }
                                               >
-                                                {previewUrl23 ? (
-                                                  previewUrl23 && (
+                                                {previewUrl23 || values.OcclussalUpper ? (
+                                                  <div className="w-100 h-100 position-relative d-flex align-items-center justify-content-center">
                                                     <img
-                                                      src={previewUrl23}
-                                                      alt="image"
+                                                      src={previewUrl23 || values.OcclussalUpper}
+                                                      alt="Occlusal Upper"
                                                       className="img-s"
+                                                      style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "4px" }}
                                                     />
-                                                  )
+                                                    <span
+                                                      className="position-absolute bottom-0 start-0 end-0 text-center text-white py-1 px-1"
+                                                      style={{ background: "rgba(0,0,0,0.65)", fontSize: "11px", fontWeight: "600", borderBottomLeftRadius: "4px", borderBottomRightRadius: "4px" }}
+                                                    >
+                                                      Occlusal Upper
+                                                    </span>
+                                                    <button
+                                                      type="button"
+                                                      title="Remove photo"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setPreviewUrl23("");
+                                                        setImage6623(null);
+                                                        setstate6623(null);
+                                                        setValues((prev) => ({ ...prev, OcclussalUpper: "" }));
+                                                        if (fileInput23.current) fileInput23.current.value = "";
+                                                      }}
+                                                      style={{
+                                                        position: "absolute",
+                                                        top: "4px",
+                                                        right: "4px",
+                                                        border: "none",
+                                                        background: "rgba(220, 53, 69, 0.9)",
+                                                        color: "#fff",
+                                                        borderRadius: "50%",
+                                                        width: "22px",
+                                                        height: "22px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        fontSize: "14px",
+                                                        lineHeight: "1",
+                                                        cursor: "pointer",
+                                                        zIndex: 10,
+                                                      }}
+                                                    >
+                                                      ×
+                                                    </button>
+                                                  </div>
                                                 ) : (
-                                                  <img
-                                                      src={patient[0]?.OcclussalUpper}
-                                                      alt="image"
-                                                      className="img-s"
-                                                    />
+                                                  <div className="text-center text-muted p-2">
+                                                    <FaUpload className="mb-1" style={{ fontSize: "1.2rem", color: "#C49358" }} />
+                                                    <div style={{ fontSize: "12px", fontWeight: "600", color: "#333" }}>Occlusal Upper</div>
+                                                    <div style={{ fontSize: "10px", color: "#888" }}>Click or drag photo</div>
+                                                  </div>
                                                 )}
-
-                                                {/* {previewUrl23?previewUrl23 && (
-                                                  <img
-                                                    src={previewUrl23}
-                                                    alt="image"
-                                                    className="img-s"
-                                                  />
-                                                ):<p className="text-center mt-5">Upper Occulosal</p>} */}
                                               </Card>
                                               <span className="m-auto"><Button variant="" className="btn-outline-dark mt-1" onClick={IntraUpload4}>Confirm</Button>{previewUrl23?<span id="intim4">Confirm to upload!</span>:""}</span>
                                               {progressI4 &&
-                      // <ProgressBar variant="success" className="m-2 mx-0" now={Progress} label={`${Progress}%`} min={0} max={100} style={{width:`${Progress}%`}}/>
                       <Spinner animation="border"/>
                       }
                                             </Col>
-                                            {/* <Col md={4}>
-                                              <Card
-                                                className="crd-up"
-                                                onDragOver={handleOndragOver}
-                                                onDrop={handleOndrop6}
-                                                onClick={() =>
-                                                  fileInput6.current.click()
-                                                }
-                                              >
-                                                {previewUrl6 && (
-                                                  <img
-                                                    src={previewUrl6}
-                                                    alt="image"
-                                                    className="img-s"
-                                                  />
-                                                )}
-                                              </Card>
-                                            </Col> */}
                                             <Col md={6}>
                                               <Card
                                                 className="crd-up"
@@ -3463,60 +3849,67 @@ function formatDate(date) {
                                                   fileInput24.current.click()
                                                 }
                                               >
-                                                {previewUrl24 ? (
-                                                  previewUrl24 && (
+                                                {previewUrl24 || values.OcclussalLower ? (
+                                                  <div className="w-100 h-100 position-relative d-flex align-items-center justify-content-center">
                                                     <img
-                                                      src={previewUrl24}
-                                                      alt="image"
+                                                      src={previewUrl24 || values.OcclussalLower}
+                                                      alt="Occlusal Lower"
                                                       className="img-s"
+                                                      style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "4px" }}
                                                     />
-                                                  )
+                                                    <span
+                                                      className="position-absolute bottom-0 start-0 end-0 text-center text-white py-1 px-1"
+                                                      style={{ background: "rgba(0,0,0,0.65)", fontSize: "11px", fontWeight: "600", borderBottomLeftRadius: "4px", borderBottomRightRadius: "4px" }}
+                                                    >
+                                                      Occlusal Lower
+                                                    </span>
+                                                    <button
+                                                      type="button"
+                                                      title="Remove photo"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setPreviewUrl24("");
+                                                        setImage6624(null);
+                                                        setstate6624(null);
+                                                        setValues((prev) => ({ ...prev, OcclussalLower: "" }));
+                                                        if (fileInput24.current) fileInput24.current.value = "";
+                                                      }}
+                                                      style={{
+                                                        position: "absolute",
+                                                        top: "4px",
+                                                        right: "4px",
+                                                        border: "none",
+                                                        background: "rgba(220, 53, 69, 0.9)",
+                                                        color: "#fff",
+                                                        borderRadius: "50%",
+                                                        width: "22px",
+                                                        height: "22px",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                        fontSize: "14px",
+                                                        lineHeight: "1",
+                                                        cursor: "pointer",
+                                                        zIndex: 10,
+                                                      }}
+                                                    >
+                                                      ×
+                                                    </button>
+                                                  </div>
                                                 ) : (
-                                                  <img
-                                                      src={patient[0]?.OcclussalLower}
-                                                      alt="image"
-                                                      className="img-s"
-                                                    />
+                                                  <div className="text-center text-muted p-2">
+                                                    <FaUpload className="mb-1" style={{ fontSize: "1.2rem", color: "#C49358" }} />
+                                                    <div style={{ fontSize: "12px", fontWeight: "600", color: "#333" }}>Occlusal Lower</div>
+                                                    <div style={{ fontSize: "10px", color: "#888" }}>Click or drag photo</div>
+                                                  </div>
                                                 )}
-
-                                                {/* {previewUrl24?previewUrl24 && (
-                                                  <img
-                                                    src={previewUrl24}
-                                                    alt="image"
-                                                    className="img-s"
-                                                  />
-                                                ):<p className="text-center mt-5">Lower Occulosal</p>} */}
                                               </Card>
-                                              <span className="m-auto"><Button variant="" className="btn-outline-dark mt-1" onClick={IntraUpload5}>Confirm</Button>{[previewUrl24]?<span id="intim5">Confirm to upload!</span>:""}</span>
+                                              <span className="m-auto"><Button variant="" className="btn-outline-dark mt-1" onClick={IntraUpload5}>Confirm</Button>{previewUrl24?<span id="intim5">Confirm to upload!</span>:""}</span>
                                               {progressI5 &&
-                      // <ProgressBar variant="success" className="m-2 mx-0" now={Progress} label={`${Progress}%`} min={0} max={100} style={{width:`${Progress}%`}}/>
-                      <Spinner animation="border"/>
-                      }
+                                                <Spinner animation="border"/>
+                                              }
                                             </Col>
                                           </Row>
-                                          {/* {previewUrl ? (
-                                                ""
-                                                ) : (
-                                                <p className="text-center">
-                                                Drag or click to browse
-                                                </p>
-                                                )} */}
-                                                                        {/* {" "}
-                                                <br />
-                                                <Button
-                                                variant=""
-                                                onClick={() => {
-                                                setPreviewUrl("");
-                                                // e.stopPropagation();
-                                                }}
-                                                >
-                                                Delete
-                                                </Button>
-                                                <p> {image.name} </p>
-                                                </div>
-                                                )}
-                                            
-                                                } */}
                                         </Card>
                                         <Card
                                           className="desc1 border-0"
@@ -3657,22 +4050,60 @@ function formatDate(date) {
                                                   fileInputTab71.current.click()
                                                 }
                                               >
-                                                {previewUrlTab71 ? (
-                                                  ""
-                                                ) : (
-                                                  <img
-                                                    src={patient[0]?.XrayLeft}
-                                                    alt="image"
-                                                    className="img-s m-3"
-                                                  />
-                                                )}
-                                                {previewUrlTab71 && (
-                                                  <img
-                                                    src={previewUrlTab71}
-                                                    alt="image"
-                                                    className="img-s m-3"
-                                                  />
-                                                )}
+                                                {previewUrlTab71 || values.XrayLeft ? (
+                                                   <div className="w-100 h-100 position-relative d-flex align-items-center justify-content-center">
+                                                     <img
+                                                       src={previewUrlTab71 || values.XrayLeft}
+                                                       alt="Panoramic / OPG X-Ray"
+                                                       className="img-s m-3"
+                                                       style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "4px" }}
+                                                     />
+                                                     <span
+                                                       className="position-absolute bottom-0 start-0 end-0 text-center text-white py-1 px-1"
+                                                       style={{ background: "rgba(0,0,0,0.65)", fontSize: "12px", fontWeight: "600", borderBottomLeftRadius: "4px", borderBottomRightRadius: "4px" }}
+                                                     >
+                                                       Panoramic / OPG X-Ray
+                                                     </span>
+                                                     <button
+                                                       type="button"
+                                                       title="Remove photo"
+                                                       onClick={(e) => {
+                                                         e.stopPropagation();
+                                                         setPreviewUrlTab71("");
+                                                         setImageTab71(null);
+                                                         setRadio(null);
+                                                         setValues((prev) => ({ ...prev, XrayLeft: "" }));
+                                                         if (fileInputTab71.current) fileInputTab71.current.value = "";
+                                                       }}
+                                                       style={{
+                                                         position: "absolute",
+                                                         top: "6px",
+                                                         right: "6px",
+                                                         border: "none",
+                                                         background: "rgba(220, 53, 69, 0.9)",
+                                                         color: "#fff",
+                                                         borderRadius: "50%",
+                                                         width: "26px",
+                                                         height: "26px",
+                                                         display: "flex",
+                                                         alignItems: "center",
+                                                         justifyContent: "center",
+                                                         fontSize: "16px",
+                                                         lineHeight: "1",
+                                                         cursor: "pointer",
+                                                         zIndex: 10,
+                                                       }}
+                                                     >
+                                                       ×
+                                                     </button>
+                                                   </div>
+                                                 ) : (
+                                                   <div className="text-center text-muted p-3">
+                                                     <FaUpload className="mb-2" style={{ fontSize: "1.8rem", color: "#C49358" }} />
+                                                     <div style={{ fontSize: "14px", fontWeight: "600", color: "#333" }}>Panoramic / OPG X-Ray</div>
+                                                     <div style={{ fontSize: "12px", color: "#888" }}>Click or drag radiograph here</div>
+                                                   </div>
+                                                 )}
                                               </Card>
                                               <span className="m-auto"><Button variant="" className="btn-outline-dark mt-1" onClick={RadioUpload1}>Confirm</Button>{previewUrlTab71?<span id="rim1">Confirm to upload!</span>:""}</span>
 
@@ -3688,22 +4119,60 @@ function formatDate(date) {
                                                   fileInputTab72.current.click()
                                                 }
                                               >
-                                                {previewUrlTab72 ? (
-                                                  ""
-                                                ) : (
-                                                  <img
-                                                    src={patient[0]?.XrayRight}
-                                                    alt="image"
-                                                    className="img-s2 m-3"
-                                                  />
-                                                )}
-                                                {previewUrlTab72 && (
-                                                  <img
-                                                    src={previewUrlTab72}
-                                                    alt="image"
-                                                    className="img-s2 m-3"
-                                                  />
-                                                )}
+                                                {previewUrlTab72 || values.XrayRight ? (
+                                                   <div className="w-100 h-100 position-relative d-flex align-items-center justify-content-center">
+                                                     <img
+                                                       src={previewUrlTab72 || values.XrayRight}
+                                                       alt="Cephalometric / Lateral Ceph"
+                                                       className="img-s2 m-3"
+                                                       style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "4px" }}
+                                                     />
+                                                     <span
+                                                       className="position-absolute bottom-0 start-0 end-0 text-center text-white py-1 px-1"
+                                                       style={{ background: "rgba(0,0,0,0.65)", fontSize: "12px", fontWeight: "600", borderBottomLeftRadius: "4px", borderBottomRightRadius: "4px" }}
+                                                     >
+                                                       Cephalometric / Lateral Ceph
+                                                     </span>
+                                                     <button
+                                                       type="button"
+                                                       title="Remove photo"
+                                                       onClick={(e) => {
+                                                         e.stopPropagation();
+                                                         setPreviewUrlTab72("");
+                                                         setImageTab72(null);
+                                                         setRadio1(null);
+                                                         setValues((prev) => ({ ...prev, XrayRight: "" }));
+                                                         if (fileInputTab72.current) fileInputTab72.current.value = "";
+                                                       }}
+                                                       style={{
+                                                         position: "absolute",
+                                                         top: "6px",
+                                                         right: "6px",
+                                                         border: "none",
+                                                         background: "rgba(220, 53, 69, 0.9)",
+                                                         color: "#fff",
+                                                         borderRadius: "50%",
+                                                         width: "26px",
+                                                         height: "26px",
+                                                         display: "flex",
+                                                         alignItems: "center",
+                                                         justifyContent: "center",
+                                                         fontSize: "16px",
+                                                         lineHeight: "1",
+                                                         cursor: "pointer",
+                                                         zIndex: 10,
+                                                       }}
+                                                     >
+                                                       ×
+                                                     </button>
+                                                   </div>
+                                                 ) : (
+                                                   <div className="text-center text-muted p-3">
+                                                     <FaUpload className="mb-2" style={{ fontSize: "1.8rem", color: "#C49358" }} />
+                                                     <div style={{ fontSize: "14px", fontWeight: "600", color: "#333" }}>Cephalometric / Lateral Ceph</div>
+                                                     <div style={{ fontSize: "12px", color: "#888" }}>Click or drag radiograph here</div>
+                                                   </div>
+                                                 )}
                                               </Card>
                                               <span className="m-auto"><Button variant="" className="btn-outline-dark mt-1" onClick={RadioUpload2}>Confirm</Button>{previewUrlTab72?<span id="rim2">Confirm to upload!</span>:""}</span>
 
@@ -3802,7 +4271,7 @@ function formatDate(date) {
                                           <Col>
                                             <Form.Group controlId="formFile" className="mb-3">
                                               <Form.Label className="pd-vid">Who is uploading videos? (Name of Dr.)</Form.Label>
-                                              <Form.Control type="text" name="DoctorUploadingVideo" onChange={(e) => {
+                                              <Form.Control type="text" name="DoctorUploadingVideo" value={DoctorUploadingVideo} onChange={(e) => {
                                                 setDoctorUploadingVideo(e.target.value)
                                               }} />
                                             </Form.Group>
@@ -3864,7 +4333,7 @@ function formatDate(date) {
                                     <Col>
                                             <Form.Group controlId="formFile" className="mb-3">
                                               <Form.Label className="pd-vid">Does this patient requires IPR?</Form.Label>
-                                              <Form.Select name="RequiredIPR" onChange={(e) => {
+                                              <Form.Select name="RequiredIPR" value={RequiredIPR} onChange={(e) => {
                                                 setRequiredIPR(e.target.value)
                                               }}>
                                                 <option value=""></option>
