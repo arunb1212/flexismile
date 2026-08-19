@@ -1080,45 +1080,59 @@ const onChangeVideo = (e) => {
 };
 
 const addUploadVideo = async (newarr) => {
-  await axios
-    .post(
+  try {
+    const res = await axios.post(
       "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/AddUploadMultipleVideo",
       newarr,
       {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
         onUploadProgress: (ProgressEvent) => {
-          console.log(
-            "Upload Progress:" +
-              Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100) +
-              "%"
-          );
+          if (ProgressEvent.total > 0) {
+            console.log(
+              "Upload Progress:" +
+                Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100) +
+                "%"
+            );
+          }
         },
       }
-    )
-    .then((res) => {
-      console.log(res.data);
-      if (res.data.status === true) {
-        setValues(pre => { return {...pre, PathVideo: newarr.VideoPath.join(',') } })
-        Swal.fire({
-          icon: "success",
-          title: "Videos uploaded successfully!",
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: res.data?.message || "Failed to save video!",
-        });
-      }
-      setVideoProgress(null);
-    })
-    .catch((err) => {
-      console.error("Video save error:", err);
-      setVideoProgress(null);
+    );
+
+    console.log("AddUploadMultipleVideo response:", res.data);
+    if (
+      res.data?.status === true ||
+      res.data?.status === "true" ||
+      res.data?.status === "1" ||
+      res.data?.status === 1 ||
+      (res.data?.message && res.data.message.toLowerCase().includes("success"))
+    ) {
+      const paths = Array.isArray(newarr.VideoPath)
+        ? newarr.VideoPath.join(",")
+        : newarr.VideoPath;
+      setValues((pre) => ({ ...pre, PathVideo: paths }));
+      Swal.fire({
+        icon: "success",
+        title: "Videos uploaded successfully!",
+      });
+    } else {
       Swal.fire({
         icon: "error",
-        title: "Failed to save video",
-        text: err.message
+        title: res.data?.message || "Failed to save video!",
       });
+    }
+  } catch (err) {
+    console.error("Video save error:", err);
+    Swal.fire({
+      icon: "error",
+      title: "Failed to save video",
+      text: err.message,
     });
+  } finally {
+    setVideoProgress(null);
+  }
 };
 
 const uploadHandlerVideo = async (e) => {
@@ -1132,54 +1146,76 @@ const uploadHandlerVideo = async (e) => {
     return;
   }
 
+  const patientId = values.PatientId || urlParams?.PatientId || ID;
+  const currentDocUserId = sessionStorage.getItem("DocUserId") || DoctorUserID || values.DoctorId || "1";
+  const currentRole = sessionStorage.getItem("Role") || Role || "2";
+  const currentDocName = DoctorUploadingVideo || sessionStorage.getItem("DocName") || DoctorName || "Doctor";
+
   const fd = new FormData();
-  fd.append("PatientId", values.PatientId);
+  fd.append("PatientId", patientId);
   for (let i = 0; i < videoFiles.length; i++) {
     fd.append("Name", videoFiles[i].name);
     fd.append("fileContent", videoFiles[i]);
   }
-  console.log("ID is:" + values.PatientId);
-  console.log(videoFiles);
+  console.log("Uploading video for PatientId:", patientId, "files:", videoFiles);
 
-  await axios
-    .post(
+  setVideoProgress(10);
+
+  try {
+    const res = await axios.post(
       "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadMultipleVideo",
       fd,
       {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
         onUploadProgress: (ProgressEvent) => {
-          setVideoProgress(
-            Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
-          );
-          console.log(
-            "Upload Progress:" +
-              Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100) +
-              "%"
-          );
+          if (ProgressEvent.total > 0) {
+            setVideoProgress(
+              Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
+            );
+          }
         },
       }
-    )
-    .then((res) => {
-      console.log("below is arr");
-      console.log(res.data.data);
-      let arr = res.data.data;
-      if (arr && Array.isArray(arr)) {
-        let newarr = arr.map(({ imageurl }) => imageurl);
-        console.log(newarr);
-        let n = { PatientId: values.PatientId, CreateId: DoctorUserID, VideoPath: newarr, DoctorUploadingVideo: DoctorUploadingVideo };
-        addUploadVideo(n);
-      } else {
-        setVideoProgress(null);
-      }
-    })
-    .catch((err) => {
-      console.error("Video upload error:", err);
+    );
+
+    console.log("UploadMultipleVideo response:", res.data);
+    let arr = res.data?.data;
+    let videoPaths = [];
+
+    if (Array.isArray(arr)) {
+      videoPaths = arr.map((item) => item?.imageurl || item?.path || item).filter(Boolean);
+    } else if (typeof arr === "string" && arr.trim() !== "") {
+      videoPaths = [arr];
+    } else if (res.data?.path) {
+      videoPaths = [res.data.path];
+    }
+
+    if (videoPaths.length > 0) {
+      let n = {
+        PatientId: patientId,
+        CreateId: currentRole,
+        VideoPath: videoPaths,
+        DoctorUploadingVideo: currentDocName,
+      };
+      await addUploadVideo(n);
+    } else {
       setVideoProgress(null);
       Swal.fire({
         icon: "error",
         title: "Video upload failed",
-        text: err.message
+        text: res.data?.message || "No video path returned from server.",
       });
+    }
+  } catch (err) {
+    console.error("Video upload error:", err);
+    setVideoProgress(null);
+    Swal.fire({
+      icon: "error",
+      title: "Video upload failed",
+      text: err.message,
     });
+  }
 };
 
 // IPR functions
@@ -4279,28 +4315,50 @@ function formatDate(date) {
                                           
                                         </Row>
                                         <Row>
-                                          <Col>
-                                            <Form.Group controlId="formFile" className="mb-3">
-                                              <Form.Label className="pd-vid">Upload Videos</Form.Label>
-                                              <Form.Control
-                                                type="file"
-                                                multiple
-                                                onChange={onChangeVideo}
-                                                name="Name"
-                                              />
-                                            </Form.Group>
-                                            {videoProgress &&
-                                              <Spinner animation="border" id="spin" />
-                                            }
-                                            <Button
-                                              variant=""
-                                              className="btn btn-outline-dark"
-                                              onClick={uploadHandlerVideo}
-                                            >
-                                              Upload
-                                            </Button>
-                                          </Col>
-                                        </Row>
+                                           <Col>
+                                             <Form.Group controlId="formFile" className="mb-3">
+                                               <Form.Label className="pd-vid">Upload Videos</Form.Label>
+                                               <Form.Control
+                                                 type="file"
+                                                 accept="video/*"
+                                                 multiple
+                                                 onChange={onChangeVideo}
+                                                 name="Name"
+                                               />
+                                             </Form.Group>
+                                             {videoProgress && (
+                                               <div className="d-flex align-items-center gap-2 mb-2">
+                                                 <Spinner animation="border" id="spin" size="sm" />
+                                                 <span>Uploading video... {videoProgress}%</span>
+                                               </div>
+                                             )}
+                                             <Button
+                                               variant=""
+                                               className="btn btn-outline-dark mb-3"
+                                               onClick={uploadHandlerVideo}
+                                             >
+                                               Upload
+                                             </Button>
+                                             {values.PathVideo && (
+                                               <div className="mt-3">
+                                                 <p className="text-success fw-bold mb-2">Uploaded Video(s):</p>
+                                                 <div className="d-flex flex-wrap gap-3">
+                                                   {values.PathVideo.split(",").map((vUrl, idx) => (
+                                                     <div key={idx} className="position-relative border p-1 rounded bg-light">
+                                                       <video
+                                                         width="240"
+                                                         height="140"
+                                                         controls
+                                                         src={vUrl.trim()}
+                                                         className="rounded"
+                                                       />
+                                                     </div>
+                                                   ))}
+                                                 </div>
+                                               </div>
+                                             )}
+                                           </Col>
+                                         </Row>
                                       </Card>
                                     </Col>
                                   </Row>
