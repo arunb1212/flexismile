@@ -130,8 +130,14 @@ const [search, setSearch] = useState("");
       .then((res) => res.json())
       .then((reqData) => {
         console.log(reqData.Data);
-        setRequests(reqData.Data);
-        setFilteredNames(reqData.Data);
+        const dataList = Array.isArray(reqData?.Data) ? reqData.Data : [];
+        setRequests(dataList);
+        setFilteredNames(dataList);
+      })
+      .catch((err) => {
+        console.error("Error fetching request list:", err);
+        setRequests([]);
+        setFilteredNames([]);
       });
   }, []);
 
@@ -436,8 +442,10 @@ const [search, setSearch] = useState("");
 
 
   useEffect(() => {
-    const result = requests.filter((item) => {
-      const s = search.toLowerCase();
+    const list = Array.isArray(requests) ? requests : [];
+    const result = list.filter((item) => {
+      if (!item) return false;
+      const s = (search || "").toLowerCase();
       return (
         (item.PatientId?.toString() || "").toLowerCase().includes(s) ||
         (item.Name || "").toLowerCase().includes(s) ||
@@ -445,7 +453,7 @@ const [search, setSearch] = useState("");
       );
     });
     setFilteredNames(result);
-  }, [search]);
+  }, [search, requests]);
 
 
 
@@ -609,7 +617,7 @@ const [search, setSearch] = useState("");
                 >
                   <DataTable
                     columns={columns}
-                    data={filteredNames}
+                    data={filteredNames || []}
                     pagination
                     fixedHeader
                     highlightOnHover
