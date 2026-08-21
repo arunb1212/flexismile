@@ -1305,123 +1305,113 @@ const uploadHandlerIpr = async () => {
 
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
-      event.preventDefault();
       event.stopPropagation();
+      setValidated(true);
+      Swal.fire({
+        title: "Incomplete Details",
+        text: "Please go back and fill required fields marked with *",
+        icon: "warning",
+        confirmButtonColor: "#C49358",
+      });
+      return;
     }
     setValidated(true);
 
-    // console.log(values.PortraitPath);
-
-    const fd = new FormData();
-    // if (radGarph1.checked) {
-    //   fd.append("Name", radio.name);
-    //   fd.append("fileContent", radio);
-    //   console.log(radio);
-
-    //   fd.append("Name", radio1.name);
-    //   fd.append("fileContent", radio1);
-
-    //   await axios
-    //     .post(
-    //       "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
-    //       fd,
-    //       {
-    //         onUploadProgress: (ProgressEvent) => {
-    //           console.log(
-    //             "Upload Progress:" +
-    //               Math.round(
-    //                 (ProgressEvent.loaded / ProgressEvent.total) * 100
-    //               ) +
-    //               "%"
-    //           );
-    //         },
-    //       }
-    //     )
-    //     .then((res) => {
-    //       var arr = res.data;
-    //       console.log(arr);
-    //       var radioPath = arr.path;
-    //       // sessionStorage.setItem("path",radioPath);
-    //     });
-    // }
-    // console.log(vid);
-
     const url1 =
-      "https://www.orthosquareportal.com/FlexismileApiNew/FlexAlign.svc/AddPatientPlan";
+      "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/AddPatientRegistration";
 
-   
-    setValues((pre)=>{
-      return{...pre,PatientId:patient[0]?.PatientId}
-    })
-// console.log(values.DoctorId);
+    const patientId = patient[0]?.PatientId || urlParams?.PatientId || ID;
+    const currentDoctorId = sessionStorage.getItem("DocUserId") || DoctorUserID || values.DoctorId || "0";
+
     let n = {
-      PatientId: patient[0]?.PatientId,
+      ...values,
+      PatientId: patientId,
+      DoctorId: currentDoctorId,
       planName: "Plan " + selectedPlan,
-      PortraitPath: values.PortraitPath,
-      TypeOfPVSScan: values.TypeOfPVSScan,
-      PathOfDoc: patient.PathOfDoc,
-      ProfileRepose: values.ProfileRepose,
-      FrontalRepose: values.FrontalRepose,
-      FrontalSmiling: values.FrontalSmiling,
-      FrontOpImage: values.FrontOpImage,
-      OcclussalUpper: values.OcclussalUpper,
-      OcclussalLower: values.OcclussalLower,
-      BuccalRight: values.BuccalRight,
-      BuccalFront: values.BuccalFront,
-      BuccalLeft: values.BuccalLeft,
-      ExtraOralMoreImages: values.ExtraOralMoreImages,
-      IntraOralMoreImages: values.IntraOralMoreImages,
-      RadiographsType: values.RadiographsType,
-      XrayLeft: values.XrayLeft,
-      XrayRight: values.XrayRight,
-      PathVideo: values.PathVideo
+      PathOfDoc: patient[0]?.PathOfDoc || patient.PathOfDoc || [],
+      ClinicalConditions: Array.isArray(values.ClinicalConditions)
+        ? values.ClinicalConditions.toString()
+        : values.ClinicalConditions || "",
+      DoNotMoveTheseTeeth: Array.isArray(values.DoNotMoveTheseTeeth)
+        ? values.DoNotMoveTheseTeeth.toString()
+        : values.DoNotMoveTheseTeeth || "",
+      AvidEngagersAttachmentsOnTheseTeeth: Array.isArray(values.AvidEngagersAttachmentsOnTheseTeeth)
+        ? values.AvidEngagersAttachmentsOnTheseTeeth.toString()
+        : values.AvidEngagersAttachmentsOnTheseTeeth || "",
+      IWillExtractTheseTeethBeforeTreatment: Array.isArray(values.IWillExtractTheseTeethBeforeTreatment)
+        ? values.IWillExtractTheseTeethBeforeTreatment.toString()
+        : values.IWillExtractTheseTeethBeforeTreatment || "",
+      LeaveTheseSpacesOpen: Array.isArray(values.LeaveTheseSpacesOpen)
+        ? values.LeaveTheseSpacesOpen.toString()
+        : values.LeaveTheseSpacesOpen || "",
+      ExtraOralMoreImages: Array.isArray(values.ExtraOralMoreImages)
+        ? values.ExtraOralMoreImages.toString()
+        : values.ExtraOralMoreImages || "",
+      IntraOralMoreImages: Array.isArray(values.IntraOralMoreImages)
+        ? values.IntraOralMoreImages.toString()
+        : values.IntraOralMoreImages || "",
     };
 
-   
-    console.log("n :", n);
+    console.log("Submitting plan data n:", n);
 
-    
-
-    await fetch(url1, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(n),
-    })
-      .then((res) => res.json())
-      .then((result) => {
+    try {
+      if (typeof uploadHandlerIpr === "function") {
         uploadHandlerIpr();
-        console.log("result :", result.message);
-        if(form.checkValidity() === false){
-          alert("Please go back and fill required fields marked with "*"")
-        }
-        
-        if (
-          result.message === "Added Successful" &&
-          form.checkValidity() === true
-        ) {
-          
-          Swal.fire({
-            title: "Plan Added Successfully!",
-            // text: 'Do you want to continue',
-            icon: "success",
-            // confirmButtonText: 'Cool'
-          });
-          if(Role==="1"){
-          navigate(`/patient-list/0`);
-          }else{
-            navigate(`/patient-list/${DoctorUserID}`)
-          }
-        }
-      })
-      .catch((err) => console.log(err));
-    console.log(values);
-    // sessionStorage.removeItem("path");
-    // console.log(pPath);
+      }
 
-    // setCurrentTab((prev) => prev + 1);
+      const res = await axios.post(url1, n, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = res.data;
+      console.log("AddPatientRegistration result:", result);
+
+      const isSuccess =
+        result?.message === "Added Successful" ||
+        result?.message === "Added Successfully" ||
+        result?.status === true ||
+        result?.status === "true" ||
+        result?.status === 1 ||
+        result?.status === "1" ||
+        (result?.message && result.message.toLowerCase().includes("success")) ||
+        (result?.message && result.message.toLowerCase().includes("added"));
+
+      if (isSuccess) {
+        Swal.fire({
+          title: "Plan Added Successfully!",
+          text: "The treatment plan details have been saved.",
+          icon: "success",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#C49358",
+          allowOutsideClick: false,
+        }).then(() => {
+          const currentDocId = sessionStorage.getItem("DocUserId") || DoctorUserID || "0";
+          const currentRole = sessionStorage.getItem("Role") || Role;
+          if (currentRole === "1") {
+            navigate(`/patient-list/0`);
+          } else {
+            navigate(`/patient-list/${currentDocId}`);
+          }
+        });
+      } else {
+        Swal.fire({
+          title: result?.message || "Failed to add plan!",
+          icon: "error",
+          confirmButtonColor: "#C49358",
+        });
+      }
+    } catch (err) {
+      console.error("Submit error:", err);
+      Swal.fire({
+        title: "Error submitting plan",
+        text: err.message,
+        icon: "error",
+        confirmButtonColor: "#C49358",
+      });
+    }
   };
 
   const [reports, setReports] = useState([]);

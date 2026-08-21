@@ -1,6 +1,7 @@
 import React, { useState,useEffect } from "react";
 import { Container, Row, Col, Card, Form, Button, Badge } from "react-bootstrap";
 import { useNavigate,useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 import { getTreatmentPlans,createTreatmentPlan,updateTreatmentPlan, deleteTreatmentPlan } from "../Services/treatmentPlanService";
 
 const createPhotoPreviews = (files) =>
@@ -174,12 +175,23 @@ const removeIpr = (index) => {
     else {
       const savedPlan = await createTreatmentPlan(currentPlan,PatientId);
       setTreatmentPlans((prev) => [...prev, savedPlan]);
+      Swal.fire({
+        title: "Plan Added Successfully!",
+        text: "Treatment plan has been created.",
+        icon: "success",
+        confirmButtonColor: "#C49358",
+      });
     }
 
     setCurrentPlan(newPlanTemplate());
   } catch (err) {
     console.error(err);
-    alert("Error saving treatment plan");
+    Swal.fire({
+      title: "Error saving treatment plan",
+      text: err.message,
+      icon: "error",
+      confirmButtonColor: "#C49358",
+    });
   } finally {
     setLoading(false);
   }
