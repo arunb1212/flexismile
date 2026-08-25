@@ -615,20 +615,16 @@ const [search, setSearch] = useState("");
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <Container fluid>
-        <Row className="menuTab">
-          <Col>
-            <Card body className="border-0">
+      <Container fluid className="p-0">
+        <Row className="menuTab m-0">
+          <Col className="d-flex justify-content-center align-items-center">
+            <Card body className="border-0 p-0 bg-transparent">
               <Nav className="justify-content-center">
-                <LinkContainer to={RoleId==="1"?`/admin-dashboard`:`/prodn-dash`}>
-
+                <LinkContainer to={RoleId === "1" ? `/admin-dashboard` : `/prodn-dash`}>
                   <Nav.Link className="doc-tab active">
-                  Dashboard
+                    Dashboard
                   </Nav.Link>
                 </LinkContainer>
-                {/* <Nav.Link href="#deets" className="prof-tab">
-                  Profile
-                </Nav.Link> */}
               </Nav>
             </Card>
           </Col>
@@ -652,19 +648,59 @@ const [search, setSearch] = useState("");
                     progressPending={loading}
                     subHeader
                     expandableRows
-                    expandableRowsComponent={({data})=>{
+                    expandOnRowClicked={true}
+                    expandableRowsComponent={({ data }) => {
                       return (
-                        <>
-                        {/* <p>{data.PatientId}</p> */}
-                        <Row className="p-2">
-                          <Col>
-                            <p className="mb-1"><strong>Requested Upper Aligners:</strong> <span>{data.UpperAligners || "None"}</span></p>
-                            <p className="mb-1"><strong>Requested Lower Aligners:</strong> <span>{data.LowerAligners || "None"}</span></p>
-                            {data.DoctorName && <p className="mb-1"><strong>Doctor Name:</strong> <span>{data.DoctorName}</span></p>}
-                          </Col>
-                        </Row>
-                        </>
-                      )
+                        <div className="p-3 bg-light border-top border-bottom">
+                          <Row>
+                            <Col md={6}>
+                              <div className="mb-2">
+                                <strong className="text-dark">Requested Upper Aligners:</strong>
+                                <div className="mt-1">
+                                  {data.UpperAligners ? (
+                                    data.UpperAligners.split(",").map((item, idx) => (
+                                      <span
+                                        key={idx}
+                                        className="badge bg-secondary me-1 mb-1 p-2"
+                                        style={{ fontSize: "13px", backgroundColor: "#C49358" }}
+                                      >
+                                        Set #{item.trim()}
+                                      </span>
+                                    ))
+                                  ) : (
+                                    <span className="text-muted">None</span>
+                                  )}
+                                </div>
+                              </div>
+                            </Col>
+                            <Col md={6}>
+                              <div className="mb-2">
+                                <strong className="text-dark">Requested Lower Aligners:</strong>
+                                <div className="mt-1">
+                                  {data.LowerAligners ? (
+                                    data.LowerAligners.split(",").map((item, idx) => (
+                                      <span
+                                        key={idx}
+                                        className="badge bg-dark me-1 mb-1 p-2"
+                                        style={{ fontSize: "13px" }}
+                                      >
+                                        Set #{item.trim()}
+                                      </span>
+                                    ))
+                                  ) : (
+                                    <span className="text-muted">None</span>
+                                  )}
+                                </div>
+                              </div>
+                            </Col>
+                          </Row>
+                          {data.DoctorName && (
+                            <div className="mt-2 text-muted" style={{ fontSize: "13px" }}>
+                              <strong>Doctor:</strong> {data.DoctorName}
+                            </div>
+                          )}
+                        </div>
+                      );
                     }}
                     onRowClicked={(e)=>{
                       console.log(e);

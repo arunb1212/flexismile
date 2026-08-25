@@ -1,0 +1,100 @@
+body {
+    overflow-x: hidden;
+    background-color: #f8f3ec;
+}
+
+.navb {
+    background-color: #ebdbc6;
+}
+
+.menuTab {
+    box-shadow: 0px 3px 16px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    background: #ffffff;
+    min-height: 52px;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s all ease;
+    padding: 0;
+    margin: 0;
+}
+
+.menuTab.collapsed {
+    height: 0;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.menuTab .card {
+    background: transparent;
+}
+
+.menuTab .card-body {
+    padding: 0.4rem 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.doc-tab {
+    text-decoration: none;
+    color: #333333;
+    font-weight: 500;
+    font-size: 18px;
+    padding: 0.4rem 1.5rem !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.doc-tab.active,
+.doc-tab:focus {
+    color: #C49358;
+    border-bottom: 2px solid #C49358;
+    font-weight: 600;
+}
+
+.doc-tab:hover {
+    color: #C49358;
+}
+
+.edit-patient-btn {
+    background-color: #C49358;
+    color: white;
+    border: none;
+    padding: 0.35rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.edit-patient-btn:hover {
+    background-color: #b08147;
+    color: white;
+}
+
+.modal-lbl {
+    font-weight: 600 !important;
+}
+
+.user {
+    color: #C49358;
+    font-weight: 500;
+}
+
+.rdt_TableRow {
+    cursor: pointer;
+}
+
+.rdt_TableRow:hover {
+    background-color: #faf7f2 !important;
+}
+
+.rdt_ExpanderRow {
+    background-color: #fdfdfc;
+}
+
