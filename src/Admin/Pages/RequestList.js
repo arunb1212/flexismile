@@ -124,22 +124,51 @@ const [search, setSearch] = useState("");
       }, 2000);
   }
 
-  const url = "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/GetPatientSetsDoctorToAdminlist/0/0";
-  useEffect(() => {
-    fetch(url)
-      .then((res) => res.json())
-      .then((reqData) => {
-        console.log(reqData.Data);
-        const dataList = Array.isArray(reqData?.Data) ? reqData.Data : [];
+  const [selectedMonth, setSelectedMonth] = useState("all");
+  const [loading, setLoading] = useState(false);
+
+  const fetchRequests = async (month) => {
+    setLoading(true);
+    try {
+      if (month === "all") {
+        const months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+        const results = await Promise.all(
+          months.map(m =>
+            fetch(`https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/GetPatientSetsDoctorToAdminlist/0/${m}`)
+              .then(r => r.json())
+              .then(res => (res.status && Array.isArray(res.Data)) ? res.Data : [])
+              .catch(() => [])
+          )
+        );
+        const combined = results.flat();
+        const seen = new Set();
+        const unique = combined.filter(item => {
+          const key = item.SetsDoctorToAdminId || `${item.PatientId}_${item.PatientSetsId}_${item.RequestDate}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        setRequests(unique);
+        setFilteredNames(unique);
+      } else {
+        const res = await fetch(`https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/GetPatientSetsDoctorToAdminlist/0/${month}`);
+        const reqData = await res.json();
+        const dataList = (reqData.status && Array.isArray(reqData.Data)) ? reqData.Data : [];
         setRequests(dataList);
         setFilteredNames(dataList);
-      })
-      .catch((err) => {
-        console.error("Error fetching request list:", err);
-        setRequests([]);
-        setFilteredNames([]);
-      });
-  }, []);
+      }
+    } catch (err) {
+      console.error("Error fetching request list:", err);
+      setRequests([]);
+      setFilteredNames([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRequests(selectedMonth);
+  }, [selectedMonth]);
 
 
     const columns = [
@@ -189,7 +218,7 @@ const [search, setSearch] = useState("");
         },
         {
           name: "Request Date",
-          selector: (row) => row.RequestDate.split(" ")[0],
+          selector: (row) => (row.RequestDate ? row.RequestDate.split(" ")[0] : ""),
           sortable: true,
         },
         {
@@ -212,11 +241,8 @@ const [search, setSearch] = useState("");
                 })
 
 
-                console.log(row.UpperAligners.split(","));
-
-                let upperarray=row.UpperAligners.split(",")
-
-                let lowerarray=row.LowerAligners.split(",")
+                let upperarray = row.UpperAligners ? row.UpperAligners.split(",") : [];
+                let lowerarray = row.LowerAligners ? row.LowerAligners.split(",") : [];
 
                 setTotalUpper(upperarray);
                 setTotalLower(lowerarray);
@@ -449,7 +475,9 @@ const [search, setSearch] = useState("");
       return (
         (item.PatientId?.toString() || "").toLowerCase().includes(s) ||
         (item.Name || "").toLowerCase().includes(s) ||
-        (item.ClinicName || "").toLowerCase().includes(s)
+        (item.ClinicName || "").toLowerCase().includes(s) ||
+        (item.CaseNo?.toString() || "").toLowerCase().includes(s) ||
+        (item.DoctorName || "").toLowerCase().includes(s)
       );
     });
     setFilteredNames(result);
@@ -621,34 +649,59 @@ const [search, setSearch] = useState("");
                     pagination
                     fixedHeader
                     highlightOnHover
+                    progressPending={loading}
                     subHeader
                     expandableRows
-                  expandableRowsComponent={({data})=>{
-                    return (
-                      <>
-                      {/* <p>{data.PatientId}</p> */}
-                      <Row>
-                        <Col>
-                      <p>Requested Upper Aligners: <span>{data.UpperAligners}</span></p>
-                      <p>Requested Lower Aligners: <span>{data.LowerAligners}</span></p>
-                        
-                        </Col>
-                      </Row>
-                      </>
-                    )
-                  }}
-                 onRowClicked={(e)=>{
-                  console.log(e);
-                 }}
-
+                    expandableRowsComponent={({data})=>{
+                      return (
+                        <>
+                        {/* <p>{data.PatientId}</p> */}
+                        <Row className="p-2">
+                          <Col>
+                            <p className="mb-1"><strong>Requested Upper Aligners:</strong> <span>{data.UpperAligners || "None"}</span></p>
+                            <p className="mb-1"><strong>Requested Lower Aligners:</strong> <span>{data.LowerAligners || "None"}</span></p>
+                            {data.DoctorName && <p className="mb-1"><strong>Doctor Name:</strong> <span>{data.DoctorName}</span></p>}
+                          </Col>
+                        </Row>
+                        </>
+                      )
+                    }}
+                    onRowClicked={(e)=>{
+                      console.log(e);
+                    }}
                     subHeaderComponent={
-                      <input
-                        type="text"
-                        className="w-25 form-control mt-4 mb-4"
-                        placeholder="Search by Code, Name, Clinic..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                      ></input>
+                      <div className="d-flex justify-content-between align-items-center w-100 mt-4 mb-4 flex-wrap gap-3">
+                        <div className="d-flex align-items-center gap-2">
+                          <label className="me-2 fw-bold text-secondary mb-0">Filter by Month:</label>
+                          <Form.Select
+                            style={{ width: "200px" }}
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(e.target.value)}
+                          >
+                            <option value="all">All Months</option>
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                          </Form.Select>
+                        </div>
+                        <input
+                          type="text"
+                          className="form-control"
+                          style={{ maxWidth: "350px" }}
+                          placeholder="Search by Code, Name, Clinic, Case No..."
+                          value={search}
+                          onChange={(e) => setSearch(e.target.value)}
+                        />
+                      </div>
                     }
                   />
 
