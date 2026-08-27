@@ -11,6 +11,7 @@ import {
   Form,
   ProgressBar,
   Spinner,
+  Accordion,
 } from "react-bootstrap";
 import "../../Doctor/Styles/PatientList.css";
 import "../../Doctor/Styles/PatientDetails.css";
@@ -1078,6 +1079,26 @@ useEffect(() => {
                   
                   <p className="" style={{fontSize:"1.1rem",fontWeight:"bold"}}>Additional Instructions : <span style={{fontSize:"1.05rem",fontWeight:"normal"}}>{patient[0]?.AdditionalInstruction}</span></p>
                   
+                  </Col>
+                </Row>
+                <hr />
+                <Row>
+                  <Col>
+                    <p className="" style={{fontSize:"1.1rem",fontWeight:"bold"}}>Total No. Of Upper Sets : <span style={{fontSize:"1.05rem",fontWeight:"normal"}}>{patient[0]?.TotalNoOfUpperSets || "0"}</span></p>
+                    <p className="" style={{fontSize:"1.1rem",fontWeight:"bold"}}>Total No. Of Lower Sets : <span style={{fontSize:"1.05rem",fontWeight:"normal"}}>{patient[0]?.TotalNoOfLowerSets || "0"}</span></p>
+                  </Col>
+                </Row>
+                <hr />
+                <Row className="mb-3">
+                  <Col>
+                    <Button
+                      style={{ backgroundColor: "#C49358", borderColor: "#C49358", color: "white" }}
+                      onClick={() => {
+                        navigate(`/plan-details/${ID}`);
+                      }}
+                    >
+                      View Plans
+                    </Button>
                   </Col>
                 </Row>
 <hr />

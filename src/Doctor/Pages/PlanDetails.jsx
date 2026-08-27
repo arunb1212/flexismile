@@ -468,7 +468,7 @@ extra?.IntraOralMoreImagesList && (
     <p className="fs-4"><b>IPR</b></p>
 
     {
-      patient[0]?.RequiredIPR === "Yes" || patient[0]?.RequiredIPR === "" ? (
+      patient[0]?.RequiredIPR === "Yes" || patient[0]?.RequiredIPR === "" || !patient[0]?.RequiredIPR || patient[0]?.InstructionIPR === "Yes" || reports?.some(r => r?.PathDocuments) ? (
 
         <Accordion defaultActiveKey="0">
           <Accordion.Item eventKey="0">
