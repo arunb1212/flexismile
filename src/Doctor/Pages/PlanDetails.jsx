@@ -407,44 +407,43 @@ extra?.IntraOralMoreImagesList && (
                     <Row className="vid-row2" id="vid-rId">
                      
                       <Col>
-                        {
+                        {(() => {
+                          const validVideos = (pVids?.length > 0 ? pVids : (videoData || []))
+                            .filter((i) => i && (i.PathVideo || i.ParthVideo) && i.PatientVideoId !== 0);
 
-                          pVids.find(i=>i.PatientVideoId===0)? <Row className="d-flex vh-100 justify-content-center align-items-center">
-                          <Col>
-                          <p className="text-center fs-3">Videos are not available/uploaded.</p>
-                          </Col>
-                        </Row>:
-                        
-                          pVids?.map((item,index)=>{
-                            
-                            return(
-                              <>
-                              
-                              {<video width="320" height="240" controls className="vid-items">
-                          <source src={item?.PathVideo} type="video/mp4"/> 
-                          {/* <source src={item?.PathVideo} type="video/ogg"></source> */}
-                          
-                        </video>}
-                        <br />
+                          if (validVideos.length === 0) {
+                            return (
+                              <Row className="d-flex p-4 justify-content-center align-items-center">
+                                <Col>
+                                  <p className="text-center fs-3">Videos are not available/uploaded.</p>
+                                </Col>
+                              </Row>
+                            );
+                          }
 
-                          {item?.IsConfirm==="YES"?<p className="vid-status mx-5 px-5">Video Approved!</p>:""}
-
-                          {item?.IsConfirm==="No"?<p className="mx-5 px-5 vid-status2">Video Rejected!</p>:""}
-                          
-                      
-                        {/* {item?.IsConfirm==="YES"?"":<Form>
-                          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                                  <Form.Label className="vid-reason">Changes Needed</Form.Label>
-                                  <Form.Control as="textarea" name="changes" row={4} onChange={handleVidChange} placeholder="mention here...." />
-                                </Form.Group>
-                                <Button variant="" className="sub-reason">Submit</Button>
-                                
-                        </Form>} */}
-
-                              </>
-                            )
-                          })
-                          
+                          return validVideos.map((item, index) => {
+                            const vUrl = item?.PathVideo || item?.ParthVideo;
+                            return (
+                              <div key={index} className="mb-3">
+                                <video
+                                  width="320"
+                                  height="240"
+                                  controls
+                                  preload="metadata"
+                                  className="vid-items"
+                                  src={vUrl}
+                                />
+                                <br />
+                                {item?.IsConfirm === "YES" ? (
+                                  <p className="vid-status mx-5 px-5">Video Approved!</p>
+                                ) : ""}
+                                {item?.IsConfirm === "No" ? (
+                                  <p className="mx-5 px-5 vid-status2">Video Rejected!</p>
+                                ) : ""}
+                              </div>
+                            );
+                          });
+                        })()}  
                           
 
                           

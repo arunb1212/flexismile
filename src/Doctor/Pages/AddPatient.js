@@ -146,787 +146,601 @@ function AddPatient() {
   const [validated, setValidated] = useState(false);
   const navigate = useNavigate();
 
-  var radGarph1 = document.getElementById("rGraph1");
-
-  // const arrayToString = (arr) => {
-  //   for (let i = 0;i<arr.length ;i++) {
-  //     if (i == arr.length-1) {
-  //       s.concat(arr[i]);
-  //       console.log(s);
-  //     } else {
-  //       s.concat(arr[i]).concat(',');
-  //       console.log(s);
-  //     }
-  //     return s;
-  //   }
-  // }
-
-//   useEffect(() => {
-//     // let s = [1, 2, 3, 4];
-//     // console.log(s.toString());
-//     // console.log("s :", s);
-//     console.log(method);
-//   }, []);
-
-var extra = document.getElementById("ExtraNow");
-var intra = document.getElementById("IntraNow");
-
-const IndividualUpload1=async ()=>{
-  const fd=new FormData();
-
-  if (extra.checked) {
-    fd.append("Name", state6.name);
-    fd.append("fileContent", state6);
-  }
-  else{
+const IndividualUpload1 = async () => {
+  if (!state6) {
     Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
+      title: "Please select an image first!",
+      icon: "warning",
+    });
+    return;
   }
-  await axios
-  .post(
-    "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
-    fd,
-    {
-      onUploadProgress: (ProgressEvent) => {
-        setProgressE1(
-          Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
-        );
-        console.log(
-          "Upload Progress:" +
-            Math.round(
-              (ProgressEvent.loaded / ProgressEvent.total) * 100
-            ) +
-            "%"
-        );
-      },
+  const fd = new FormData();
+  fd.append("Name", state6.name);
+  fd.append("fileContent", state6);
+
+  try {
+    const res = await axios.post(
+      "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+      fd,
+      {
+        onUploadProgress: (ProgressEvent) => {
+          if (ProgressEvent.total > 0) {
+            setProgressE1(
+              Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
+            );
+          }
+        },
+      }
+    );
+    if (res.data?.path) {
+      setValues((pre) => ({ ...pre, FrontalRepose: res.data.path }));
     }
-  )
-  .then((res) => {
-    var arr = res.data;
-    console.log(arr);
-    setValues(pre=>{
-      return{...pre,FrontalRepose:res.data.path}
-    })
-    
-    let confid=document.getElementById("extim1");
-    if(res.data.status==="1"){
+    let confid = document.getElementById("extim1");
+    if (res.data?.status === "1" || res.data?.status === true || res.data?.status === 1) {
       Swal.fire({
-      title: `${state6.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-
-    confid.style.display="none"
-
+        title: `${state6?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success",
+      });
+      if (confid) confid.style.display = "none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Something went wrong!",
+        icon: "error",
+      });
+    }
+  } catch (err) {
+    console.error("Upload error:", err);
+    Swal.fire({
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error",
+    });
+  } finally {
     setProgressE1(null);
-  
   }
-  else{
+};
+
+const IndividualUpload2 = async () => {
+  if (!state62) {
     Swal.fire({
-      title: "Something went wrong!",
-      // text: 'Do you want to continue',
-      icon: "error"
-      // confirmButtonText: 'Cool'
-    })
+      title: "Please select an image first!",
+      icon: "warning",
+    });
+    return;
   }
+  const fd = new FormData();
+  fd.append("Name", state62.name);
+  fd.append("fileContent", state62);
 
-
-    
-  });
-
-
-  
-
-}
-
-
-const IndividualUpload2=async ()=>{
-  const fd=new FormData();
-
-  if (extra.checked) {
-    fd.append("Name", state62.name);
-    fd.append("fileContent", state62);
-  }
-  else{
-    Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
-  }
-  await axios
-  .post(
-    "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
-    fd,
-    {
-      onUploadProgress: (ProgressEvent) => {
-        setProgressE2(
-          Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
-        );
-        console.log(
-          "Upload Progress:" +
-            Math.round(
-              (ProgressEvent.loaded / ProgressEvent.total) * 100
-            ) +
-            "%"
-        );
-      },
+  try {
+    const res = await axios.post(
+      "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+      fd,
+      {
+        onUploadProgress: (ProgressEvent) => {
+          if (ProgressEvent.total > 0) {
+            setProgressE2(
+              Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
+            );
+          }
+        },
+      }
+    );
+    if (res.data?.path) {
+      setValues((pre) => ({ ...pre, FrontalSmiling: res.data.path }));
     }
-  )
-  .then((res) => {
-    var arr = res.data;
-    console.log(arr);
-    setValues(pre=>{
-      return{...pre,FrontalSmiling:res.data.path}
-    })
-    let confim2= document.getElementById("extim2");
-
-    if(res.data.status==="1"){Swal.fire({
-      title: `${state62.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  confim2.style.display="none"
-
-  setProgressE2(null);
-  }
-  else{
-    Swal.fire({
-      title: "Something went wrong!",
-      // text: 'Do you want to continue',
-      icon: "error"
-      // confirmButtonText: 'Cool'
-    })
-  }
-  });
-
-
-  
-
-}
-
-const IndividualUpload3=async ()=>{
-  const fd=new FormData();
-
-  if (extra.checked) {
-    fd.append("Name", state65.name);
-    fd.append("fileContent", state65);
-    console.log(state65);
-  }
-  else{
-    Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
-  }
-  await axios
-  .post(
-    "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
-    fd,
-    {
-      onUploadProgress: (ProgressEvent) => {
-        setProgressE3(
-          Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
-        );
-        console.log(
-          "Upload Progress:" +
-            Math.round(
-              (ProgressEvent.loaded / ProgressEvent.total) * 100
-            ) +
-            "%"
-        );
-      },
-    }
-  )
-  .then((res) => {
-    var arr = res.data;
-    console.log(arr);
-    setValues(pre=>{
-      return{...pre,ProfileRepose:res.data.path}
-    })
-
-    let confim3=document.getElementById("extim3")
-    if(res.data.status==="1")
-    {
+    let conf2 = document.getElementById("extim2");
+    if (res.data?.status === "1" || res.data?.status === true || res.data?.status === 1) {
       Swal.fire({
-      title: `${state65.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  confim3.style.display="none"
-
-  setProgressE3(null);
-  }
-  else{
-    Swal.fire({
-      title: "Something went wrong!",
-      // text: 'Do you want to continue',
-      icon: "error"
-      // confirmButtonText: 'Cool'
-    })
-  }
-  });
-
-
-  
-
-}
-
-
-
-      
-
-     
-const IndividualUpload4=async ()=>{
-  const fd=new FormData();
-
-  if (extra.checked) {
-    fd.append("Name", state67.name);
-    fd.append("fileContent", state67);
-    console.log(state67);
-
-  }
-  else{
-    Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
-  }
-  await axios
-  .post(
-    "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
-    fd,
-    {
-      onUploadProgress: (ProgressEvent) => {
-        setProgressE4(
-          Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
-        );
-        console.log(
-          "Upload Progress:" +
-            Math.round(
-              (ProgressEvent.loaded / ProgressEvent.total) * 100
-            ) +
-            "%"
-        );
-      },
+        title: `${state62?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success",
+      });
+      if (conf2) conf2.style.display = "none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error",
+      });
     }
-  )
-  .then((res) => {
-    var arr = res.data;
-    console.log(arr);
-    setValues(pre=>{
-      return{...pre,FrontOpImage:res.data.path}
-    })
-
-    let confim4=document.getElementById("extim4");
-
-    if(res.data.status==="1"){Swal.fire({
-      title: `${state67.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  confim4.style.display="none"
-
-  setProgressE4(null);
-  }
-  else{
+  } catch (err) {
+    console.error("Upload error:", err);
     Swal.fire({
-      title: "Something went wrong!",
-      // text: 'Do you want to continue',
-      icon: "error"
-      // confirmButtonText: 'Cool'
-    })
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error",
+    });
+  } finally {
+    setProgressE2(null);
   }
-  });
+};
 
+const IndividualUpload3 = async () => {
+  if (!state65) {
+    Swal.fire({
+      title: "Please select an image first!",
+      icon: "warning",
+    });
+    return;
+  }
+  const fd = new FormData();
+  fd.append("Name", state65.name);
+  fd.append("fileContent", state65);
 
-}
+  try {
+    const res = await axios.post(
+      "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+      fd,
+      {
+        onUploadProgress: (ProgressEvent) => {
+          if (ProgressEvent.total > 0) {
+            setProgressE3(
+              Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
+            );
+          }
+        },
+      }
+    );
+    if (res.data?.path) {
+      setValues((pre) => ({ ...pre, ProfileRepose: res.data.path }));
+    }
+    let conf3 = document.getElementById("extim3");
+    if (res.data?.status === "1" || res.data?.status === true || res.data?.status === 1) {
+      Swal.fire({
+        title: `${state65?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success",
+      });
+      if (conf3) conf3.style.display = "none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error",
+      });
+    }
+  } catch (err) {
+    console.error("Upload error:", err);
+    Swal.fire({
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error",
+    });
+  } finally {
+    setProgressE3(null);
+  }
+};
 
+const IndividualUpload4 = async () => {
+  if (!state67) {
+    Swal.fire({
+      title: "Please select an image first!",
+      icon: "warning",
+    });
+    return;
+  }
+  const fd = new FormData();
+  fd.append("Name", state67.name);
+  fd.append("fileContent", state67);
 
+  try {
+    const res = await axios.post(
+      "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+      fd,
+      {
+        onUploadProgress: (ProgressEvent) => {
+          if (ProgressEvent.total > 0) {
+            setProgressE4(
+              Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
+            );
+          }
+        },
+      }
+    );
+    if (res.data?.path) {
+      setValues((pre) => ({ ...pre, FrontOpImage: res.data.path }));
+    }
+    let conf4 = document.getElementById("extim4");
+    if (res.data?.status === "1" || res.data?.status === true || res.data?.status === 1) {
+      Swal.fire({
+        title: `${state67?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success",
+      });
+      if (conf4) conf4.style.display = "none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error",
+      });
+    }
+  } catch (err) {
+    console.error("Upload error:", err);
+    Swal.fire({
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error",
+    });
+  } finally {
+    setProgressE4(null);
+  }
+};
 
 // ---------------------------------------------------Intra Individual
 
-
-  
-
-  
-
-  
-
-  
-
-const IntraUpload1=async ()=>{
-  const fd=new FormData();
-
-  if (intra.checked) {
-    fd.append("Name", state662.name);
+const IntraUpload1 = async () => {
+  if (!state662) {
+    Swal.fire({
+      title: "Please select an image first!",
+      icon: "warning",
+    });
+    return;
+  }
+  const fd = new FormData();
+  fd.append("Name", state662.name);
   fd.append("fileContent", state662);
 
-  }
-  else{
-    Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
-  }
-  await axios
-  .post(
-    "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
-    fd,
-    {
-      onUploadProgress: (ProgressEvent) => {
-        
-        setProgressI1(
-          Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
-        );
-        console.log(
-          "Upload Progress:" +
-            Math.round(
-              (ProgressEvent.loaded / ProgressEvent.total) * 100
-            ) +
-            "%"
-        );
-      },
+  try {
+    const res = await axios.post(
+      "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+      fd,
+      {
+        onUploadProgress: (ProgressEvent) => {
+          if (ProgressEvent.total > 0) {
+            setProgressI1(
+              Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
+            );
+          }
+        },
+      }
+    );
+    if (res.data?.path) {
+      setValues((pre) => ({ ...pre, BuccalRight: res.data.path }));
     }
-  )
-  .then((res) => {
-    var arr = res.data;
-    console.log(arr);
-    setValues(pre=>{
-      return{...pre,BuccalRight:res.data.path}
-    })
-
-
-    let confint1=document.getElementById("intim1");
-
-    if(res.data.status==="1"){Swal.fire({
-      title: `${state662.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  confint1.style.display="none"
-
-  setProgressI1(null);
-  }
-  else{
-    Swal.fire({
-      title: "Something went wrong!",
-      // text: 'Do you want to continue',
-      icon: "error"
-      // confirmButtonText: 'Cool'
-    })
-  }
-  });
-
-
-}
-
-
-
-
-const IntraUpload2=async ()=>{
-  const fd=new FormData();
-
-  if (intra.checked) {
-    fd.append("Name", state6621.name);
-    fd.append("fileContent", state6621);
-
-  }
-  else{
-    Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
-  }
-  await axios
-  .post(
-    "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
-    fd,
-    {
-      onUploadProgress: (ProgressEvent) => {
-        setProgressI2(
-          Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
-        );
-        console.log(
-          "Upload Progress:" +
-            Math.round(
-              (ProgressEvent.loaded / ProgressEvent.total) * 100
-            ) +
-            "%"
-        );
-      },
+    let confint1 = document.getElementById("intim1");
+    if (res.data?.status === "1" || res.data?.status === true || res.data?.status === 1) {
+      Swal.fire({
+        title: `${state662?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success",
+      });
+      if (confint1) confint1.style.display = "none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error",
+      });
     }
-  )
-  .then((res) => {
-    var arr = res.data;
-    console.log(arr);
-    setValues(pre=>{
-      return{...pre,BuccalLeft:res.data.path}
-    })
-let confint2=document.getElementById("intim2");
-    if(res.data.status==="1"){Swal.fire({
-      title: `${state6621.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  confint2.style.display="none"
-
-  setProgressI2(null);
-
-  }
-  else{
+  } catch (err) {
+    console.error("Upload error:", err);
     Swal.fire({
-      title: "Something went wrong!",
-      // text: 'Do you want to continue',
-      icon: "error"
-      // confirmButtonText: 'Cool'
-    })
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error",
+    });
+  } finally {
+    setProgressI1(null);
   }
-  });
+};
 
-
-}
-
-
-
-const IntraUpload3=async ()=>{
-  const fd=new FormData();
-
-  if (intra.checked) {
-    fd.append("Name", state6622.name);
-    fd.append("fileContent", state6622);
-
-  }
-  else{
+const IntraUpload2 = async () => {
+  if (!state6621) {
     Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
+      title: "Please select an image first!",
+      icon: "warning",
+    });
+    return;
   }
-  await axios
-  .post(
-    "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
-    fd,
-    {
-      onUploadProgress: (ProgressEvent) => {
-        setProgressI3(
-          Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
-        );
-        console.log(
-          "Upload Progress:" +
-            Math.round(
-              (ProgressEvent.loaded / ProgressEvent.total) * 100
-            ) +
-            "%"
-        );
-      },
+  const fd = new FormData();
+  fd.append("Name", state6621.name);
+  fd.append("fileContent", state6621);
+
+  try {
+    const res = await axios.post(
+      "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+      fd,
+      {
+        onUploadProgress: (ProgressEvent) => {
+          if (ProgressEvent.total > 0) {
+            setProgressI2(
+              Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
+            );
+          }
+        },
+      }
+    );
+    if (res.data?.path) {
+      setValues((pre) => ({ ...pre, BuccalLeft: res.data.path }));
     }
-  )
-  .then((res) => {
-    var arr = res.data;
-    console.log(arr);
-    setValues(pre=>{
-            return{...pre,BuccalFront:res.data.path}
-          })
-
-          let confint3=document.getElementById("intim3");
-
-          if(res.data.status==="1"){Swal.fire({
-            title: `${state6622.name} \nUploaded Successfully!`,
-            // text: 'Do you want to continue',
-            icon: "success"
-            // confirmButtonText: 'Cool'
-          })
-        confint3.style.display="none"
-
-        setProgressI3(null);
-        }
-        else{
-          Swal.fire({
-            title: "Something went wrong!",
-            // text: 'Do you want to continue',
-            icon: "error"
-            // confirmButtonText: 'Cool'
-          })
-        }
-  });
-
-
-}
-
-
-
-const IntraUpload4=async ()=>{
-  const fd=new FormData();
-
-  if (intra.checked) {
-    fd.append("Name", state6623.name);
-    fd.append("fileContent", state6623);
-
-  }
-  else{
-    Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
-  }
-  await axios
-  .post(
-    "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
-    fd,
-    {
-      onUploadProgress: (ProgressEvent) => {
-        setProgressI4(
-          Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
-        );
-        console.log(
-          "Upload Progress:" +
-            Math.round(
-              (ProgressEvent.loaded / ProgressEvent.total) * 100
-            ) +
-            "%"
-        );
-      },
+    let confint2 = document.getElementById("intim2");
+    if (res.data?.status === "1" || res.data?.status === true || res.data?.status === 1) {
+      Swal.fire({
+        title: `${state6621?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success",
+      });
+      if (confint2) confint2.style.display = "none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error",
+      });
     }
-  )
-  .then((res) => {
-    var arr = res.data;
-    console.log(arr);
-    setValues(pre=>{
-      return{...pre,OcclussalUpper:res.data.path}
-    })
-let confint4=document.getElementById("intim4");
-    if(res.data.status==="1"){Swal.fire({
-      title: `${state6623.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-confint4.style.display="none"
-
-setProgressI4(null);
-  }
-  else{
+  } catch (err) {
+    console.error("Upload error:", err);
     Swal.fire({
-      title: "Something went wrong!",
-      // text: 'Do you want to continue',
-      icon: "error"
-      // confirmButtonText: 'Cool'
-    })
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error",
+    });
+  } finally {
+    setProgressI2(null);
   }
-  });
+};
 
-
-}
-
-
-
-const IntraUpload5=async ()=>{
-  const fd=new FormData();
-
-  if (intra.checked) {
-    fd.append("Name", state6624.name);
-    fd.append("fileContent", state6624);
-    console.log(state6624);
-  
-  }
-  else{
+const IntraUpload3 = async () => {
+  if (!state6622) {
     Swal.fire({
-      title: "Select the Upload photos now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
+      title: "Please select an image first!",
+      icon: "warning",
+    });
+    return;
   }
-  await axios
-  .post(
-    "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
-    fd,
-    {
-      onUploadProgress: (ProgressEvent) => {
-        setProgressI5(
-          Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
-        );
-        console.log(
-          "Upload Progress:" +
-            Math.round(
-              (ProgressEvent.loaded / ProgressEvent.total) * 100
-            ) +
-            "%"
-        );
-      },
+  const fd = new FormData();
+  fd.append("Name", state6622.name);
+  fd.append("fileContent", state6622);
+
+  try {
+    const res = await axios.post(
+      "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+      fd,
+      {
+        onUploadProgress: (ProgressEvent) => {
+          if (ProgressEvent.total > 0) {
+            setProgressI3(
+              Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
+            );
+          }
+        },
+      }
+    );
+    if (res.data?.path) {
+      setValues((pre) => ({ ...pre, BuccalFront: res.data.path }));
     }
-  )
-  .then((res) => {
-    var arr = res.data;
-    console.log(arr);
-    setValues(pre=>{
-      return{...pre,OcclussalLower:res.data.path}
-    })
-    
-    let confint5=document.getElementById("intim5");
-
-    if(res.data.status==="1"){Swal.fire({
-      title: `${state6624.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  confint5.style.display="none"
-
-  setProgressI5(null);
-  }
-  else{
+    let confint3 = document.getElementById("intim3");
+    if (res.data?.status === "1" || res.data?.status === true || res.data?.status === 1) {
+      Swal.fire({
+        title: `${state6622?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success",
+      });
+      if (confint3) confint3.style.display = "none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error",
+      });
+    }
+  } catch (err) {
+    console.error("Upload error:", err);
     Swal.fire({
-      title: "Something went wrong!",
-      // text: 'Do you want to continue',
-      icon: "error"
-      // confirmButtonText: 'Cool'
-    })
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error",
+    });
+  } finally {
+    setProgressI3(null);
   }
-  });
+};
 
+const IntraUpload4 = async () => {
+  if (!state6623) {
+    Swal.fire({
+      title: "Please select an image first!",
+      icon: "warning",
+    });
+    return;
+  }
+  const fd = new FormData();
+  fd.append("Name", state6623.name);
+  fd.append("fileContent", state6623);
 
-}
+  try {
+    const res = await axios.post(
+      "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+      fd,
+      {
+        onUploadProgress: (ProgressEvent) => {
+          if (ProgressEvent.total > 0) {
+            setProgressI4(
+              Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
+            );
+          }
+        },
+      }
+    );
+    if (res.data?.path) {
+      setValues((pre) => ({ ...pre, UpperOcclusal: res.data.path }));
+    }
+    let confint4 = document.getElementById("intim4");
+    if (res.data?.status === "1" || res.data?.status === true || res.data?.status === 1) {
+      Swal.fire({
+        title: `${state6623?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success",
+      });
+      if (confint4) confint4.style.display = "none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error",
+      });
+    }
+  } catch (err) {
+    console.error("Upload error:", err);
+    Swal.fire({
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error",
+    });
+  } finally {
+    setProgressI4(null);
+  }
+};
 
+const IntraUpload5 = async () => {
+  if (!state6624) {
+    Swal.fire({
+      title: "Please select an image first!",
+      icon: "warning",
+    });
+    return;
+  }
+  const fd = new FormData();
+  fd.append("Name", state6624.name);
+  fd.append("fileContent", state6624);
 
+  try {
+    const res = await axios.post(
+      "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+      fd,
+      {
+        onUploadProgress: (ProgressEvent) => {
+          if (ProgressEvent.total > 0) {
+            setProgressI5(
+              Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100)
+            );
+          }
+        },
+      }
+    );
+    if (res.data?.path) {
+      setValues((pre) => ({ ...pre, LowerOcclusal: res.data.path }));
+    }
+    let confint5 = document.getElementById("intim5");
+    if (res.data?.status === "1" || res.data?.status === true || res.data?.status === 1) {
+      Swal.fire({
+        title: `${state6624?.name || "Photo"} \nUploaded Successfully!`,
+        icon: "success",
+      });
+      if (confint5) confint5.style.display = "none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error",
+      });
+    }
+  } catch (err) {
+    console.error("Upload error:", err);
+    Swal.fire({
+      title: "Failed to upload image!",
+      text: err.message,
+      icon: "error",
+    });
+  } finally {
+    setProgressI5(null);
+  }
+};
 
-
-const RadioUpload1=async ()=>{
-  const fd=new FormData();
-
-  if (radGarph1.checked) {
-    fd.append("Name", radio.name);
+const RadioUpload1 = async () => {
+  if (!radio) {
+    Swal.fire({
+      title: "Please select a file first!",
+      icon: "warning",
+    });
+    return;
+  }
+  const fd = new FormData();
+  fd.append("Name", radio.name);
   fd.append("fileContent", radio);
-  console.log(radio);
-  
-  }
-  else{
-    Swal.fire({
-      title: "Select the Upload Radiographs now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
-  }
-  await axios
-  .post(
-    "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
-    fd,
-    {
-      onUploadProgress: (ProgressEvent) => {
-        console.log(
-          "Upload Progress:" +
-            Math.round(
-              (ProgressEvent.loaded / ProgressEvent.total) * 100
-            ) +
-            "%"
-        );
-      },
+
+  try {
+    const res = await axios.post(
+      "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+      fd,
+      {
+        onUploadProgress: (ProgressEvent) => {
+          if (ProgressEvent.total > 0) {
+            console.log(
+              "Upload Progress:" +
+                Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100) +
+                "%"
+            );
+          }
+        },
+      }
+    );
+    if (res.data?.path) {
+      setValues((pre) => ({ ...pre, XrayLeft: res.data.path }));
     }
-  )
-  .then((res) => {
-    var arr = res.data;
-    console.log(arr);
-    setValues(pre=>{
-      return{...pre,XrayLeft:res.data.path}
-    })
-
-    let confrim1=document.getElementById("rim1");
-
-    if(res.data.status==="1"){Swal.fire({
-      title: `${radio.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  confrim1.style.display="none"
+    let confrim1 = document.getElementById("rim1");
+    if (res.data?.status === "1" || res.data?.status === true || res.data?.status === 1) {
+      Swal.fire({
+        title: `${radio?.name || "File"} \nUploaded Successfully!`,
+        icon: "success",
+      });
+      if (confrim1) confrim1.style.display = "none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error",
+      });
+    }
+  } catch (err) {
+    console.error("Upload error:", err);
+    Swal.fire({
+      title: "Failed to upload file!",
+      text: err.message,
+      icon: "error",
+    });
   }
-  });
+};
 
-
-}
-
-
-
-const RadioUpload2=async ()=>{
-  const fd=new FormData();
-
-  if (radGarph1.checked) {
-    
+const RadioUpload2 = async () => {
+  if (!radio1) {
+    Swal.fire({
+      title: "Please select a file first!",
+      icon: "warning",
+    });
+    return;
+  }
+  const fd = new FormData();
   fd.append("Name", radio1.name);
   fd.append("fileContent", radio1);
-  console.log(radio1);
-  
-  }
-  else{
-    Swal.fire({
-      title: "Select the Upload Radiographs now button!",
-      // text: 'Do you want to continue',
-      icon: "warning"
-      // confirmButtonText: 'Cool'
-    })
-  }
-  await axios
-  .post(
-    "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
-    fd,
-    {
-      onUploadProgress: (ProgressEvent) => {
-        console.log(
-          "Upload Progress:" +
-            Math.round(
-              (ProgressEvent.loaded / ProgressEvent.total) * 100
-            ) +
-            "%"
-        );
-      },
+
+  try {
+    const res = await axios.post(
+      "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+      fd,
+      {
+        onUploadProgress: (ProgressEvent) => {
+          if (ProgressEvent.total > 0) {
+            console.log(
+              "Upload Progress:" +
+                Math.round((ProgressEvent.loaded / ProgressEvent.total) * 100) +
+                "%"
+            );
+          }
+        },
+      }
+    );
+    if (res.data?.path) {
+      setValues((pre) => ({ ...pre, XrayRight: res.data.path }));
     }
-  )
-  .then((res) => {
-    var arr = res.data;
-    console.log(arr);
-    setValues(pre=>{
-      return{...pre,XrayRight:res.data.path}
-    })
-
-    let confrim2=document.getElementById("rim2");
-
-    if(res.data.status==="1"){Swal.fire({
-      title: `${radio1.name} \nUploaded Successfully!`,
-      // text: 'Do you want to continue',
-      icon: "success"
-      // confirmButtonText: 'Cool'
-    })
-  confrim2.style.display="none"
+    let confrim2 = document.getElementById("rim2");
+    if (res.data?.status === "1" || res.data?.status === true || res.data?.status === 1) {
+      Swal.fire({
+        title: `${radio1?.name || "File"} \nUploaded Successfully!`,
+        icon: "success",
+      });
+      if (confrim2) confrim2.style.display = "none";
+    } else {
+      Swal.fire({
+        title: res.data?.message || "Upload failed!",
+        icon: "error",
+      });
+    }
+  } catch (err) {
+    console.error("Upload error:", err);
+    Swal.fire({
+      title: "Failed to upload file!",
+      text: err.message,
+      icon: "error",
+    });
   }
-  });
-
-
-}
+};
 
 
 
@@ -941,138 +755,108 @@ let DoctorUserID=sessionStorage.getItem("DocUserId")
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    const submitBtn = document.getElementById("submitCase");
+    if (submitBtn) {
+      submitBtn.disabled = true;
+    }
 
-
-
-   
-      // if(DoctorUser){
-      //  console.log("logged in");
-      // }
-      // else{
-      //   // alert("Please Login First");
-      //   Swal.fire({
-      //     icon:"error",
-      //     title:"Please Login to continue!"
-      //   })
-      //   navigate("/")
-      // }
-  
-
-  
-document.getElementById("submitCase").onclick = function() {
-      //disable
-      this.disabled = true;
-  
-      //do some validation stuff
-  }
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
+      setValidated(true);
+      if (submitBtn) {
+        submitBtn.disabled = false;
+      }
+      alert('Please go back and fill required fields marked with "*"');
+      return;
     }
     setValidated(true);
 
-    // console.log(values.PortraitPath);
-
-    const fd = new FormData();
-    // if (radGarph1.checked) {
-    //   fd.append("Name", radio.name);
-    //   fd.append("fileContent", radio);
-    //   console.log(radio);
-
-    //   fd.append("Name", radio1.name);
-    //   fd.append("fileContent", radio1);
-
-    //   await axios
-    //     .post(
-    //       "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
-    //       fd,
-    //       {
-    //         onUploadProgress: (ProgressEvent) => {
-    //           console.log(
-    //             "Upload Progress:" +
-    //               Math.round(
-    //                 (ProgressEvent.loaded / ProgressEvent.total) * 100
-    //               ) +
-    //               "%"
-    //           );
-    //         },
-    //       }
-    //     )
-    //     .then((res) => {
-    //       var arr = res.data;
-    //       console.log(arr);
-    //       var radioPath = arr.path;
-    //       // sessionStorage.setItem("path",radioPath);
-    //     });
-    // }
-    // console.log(vid);
-    
+    let currentPortraitPath = values.PortraitPath;
+    if (state && !currentPortraitPath) {
+      try {
+        const portFd = new FormData();
+        portFd.append("Name", state.name);
+        portFd.append("fileContent", state);
+        const portRes = await axios.post(
+          "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+          portFd
+        );
+        if (
+          portRes.data &&
+          (portRes.data.status === "1" || portRes.data.status === true)
+        ) {
+          currentPortraitPath = portRes.data.path;
+          setValues((pre) => ({ ...pre, PortraitPath: portRes.data.path }));
+        }
+      } catch (portErr) {
+        console.error("Error uploading portrait:", portErr);
+      }
+    }
 
     const url =
       "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/AddPatientRegistration";
 
-   
-    setValues((pre)=>{
-      return{...pre,DoctorId:DoctorUserID}
-    })
-console.log(values.DoctorId);
     let n = {
       ...values,
-      // DoctorId:values.DoctorId,
-      ClinicalConditions: values.ClinicalConditions.toString(),
-      DoNotMoveTheseTeeth: values.DoNotMoveTheseTeeth.toString(),
-      AvidEngagersAttachmentsOnTheseTeeth: values.AvidEngagersAttachmentsOnTheseTeeth.toString(),
+      PortraitPath: currentPortraitPath || values.PortraitPath,
+      DoctorId: DoctorUserID,
+      ClinicalConditions: values.ClinicalConditions
+        ? values.ClinicalConditions.toString()
+        : "",
+      DoNotMoveTheseTeeth: values.DoNotMoveTheseTeeth
+        ? values.DoNotMoveTheseTeeth.toString()
+        : "",
+      AvidEngagersAttachmentsOnTheseTeeth:
+        values.AvidEngagersAttachmentsOnTheseTeeth
+          ? values.AvidEngagersAttachmentsOnTheseTeeth.toString()
+          : "",
       IWillExtractTheseTeethBeforeTreatment:
-        values.IWillExtractTheseTeethBeforeTreatment.toString(),
-      LeaveTheseSpacesOpen: values.LeaveTheseSpacesOpen.toString(),
-      // ExtraOralMoreImages:values.ExtraOralMoreImages.toString(),
-      // IntraOralMoreImages:values.IntraOralMoreImages.toString(),
-        
-      
+        values.IWillExtractTheseTeethBeforeTreatment
+          ? values.IWillExtractTheseTeethBeforeTreatment.toString()
+          : "",
+      LeaveTheseSpacesOpen: values.LeaveTheseSpacesOpen
+        ? values.LeaveTheseSpacesOpen.toString()
+        : "",
     };
 
-   
     console.log("n :", n);
 
-    
-    if(form.checkValidity() === false){
-      alert("Please go back and fill required fields marked with "*"")
-    }else{
-    await fetch(url, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(n),
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        console.log("result :", result.message);
-        
-        if (
-          result.message === "Added Successful" &&
-          form.checkValidity() === true
-        ) {
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(n),
+      });
+      const result = await res.json();
+      console.log("result :", result.message);
 
-          Swal.fire({
-            title: "Added Successfully!",
-            // text: 'Do you want to continue',
-            icon: "success",
-            // confirmButtonText: 'Cool'
-          });
-          navigate(`/patient-list/${DoctorUserID}`);
+      if (result.message === "Added Successful") {
+        Swal.fire({
+          title: "Added Successfully!",
+          icon: "success",
+        });
+        navigate(`/patient-list/${DoctorUserID}`);
+      } else {
+        if (submitBtn) {
+          submitBtn.disabled = false;
         }
-      })
-      .catch((err) => console.log(err));
-
+        Swal.fire({
+          title: "Submission failed",
+          text: result.message || "Please check your inputs and try again.",
+          icon: "error",
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      if (submitBtn) {
+        submitBtn.disabled = false;
+      }
     }
-    console.log(values);
-    // sessionStorage.removeItem("path");
-    // console.log(pPath);
-
-    // setCurrentTab((prev) => prev + 1);
   };
 
   
@@ -1113,190 +897,82 @@ console.log(values.DoctorId);
 
   const [radio1, setRadio1] = useState(null);
 
-  var portrait = document.getElementById("four1");
-
-  // const getBase64=(file)=>{
-  //   return new Promise((resolve)=>{
-  //     let baseURL="";
-  //     let reader=new FileReader();
-  //     reader.readAsDataURL(file);
-  //     reader.onload=()=>{
-  //       console.log("Called",reader);
-  //       baseURL=reader.result;
-  //       resolve(baseURL);
-  //     }
-  //   })
-  // }
-
   const handleupload = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+
+    if (!state) {
+      Swal.fire({
+        title: "Please select a portrait photo to upload!",
+        icon: "warning",
+      });
+      return;
+    }
 
     const fd = new FormData();
+    fd.append("Name", state.name);
+    fd.append("fileContent", state);
 
-    if (portrait.checked) {
-      fd.append("Name", state.name);
-      fd.append("fileContent", state);
-      console.log(state);
+    try {
+      const res = await axios.post(
+        "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
+        fd,
+        {
+          onUploadProgress: (ProgressEvent) => {
+            console.log(
+              "Upload Progress:" +
+                Math.round(
+                  (ProgressEvent.loaded / ProgressEvent.total) * 100
+                ) +
+                "%"
+            );
+          },
+        }
+      );
 
-   await axios
-        .post(
-          "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadPhotosNew",
-          fd,
-          {
-            onUploadProgress: (ProgressEvent) => {
-              console.log(
-                "Upload Progress:" +
-                  Math.round(
-                    (ProgressEvent.loaded / ProgressEvent.total) * 100
-                  ) +
-                  "%"
-              );
-            },
-          }
-          )
-          .then((res) => {
-          
-          // console.log(res);
-          var arr = res.data;
-          console.log(arr);
-          setValues(pre=>{
-            return{...pre,PortraitPath:res.data.path}
-          })
-
-          if(res.data.status==="1"){Swal.fire({
-            title: `${state.name} \nUploaded Successfully!`,
-            // text: 'Do you want to continue',
-            icon: "success"
-            // confirmButtonText: 'Cool'
-          })}
-          // setportraitPath(arr.path)
-          console.log(res.data.path);
-          // var portPath = arr.path;
-          // console.log(portPath);
-        
+      if (
+        res.data &&
+        (res.data.status === "1" || res.data.status === true)
+      ) {
+        setValues((pre) => ({
+          ...pre,
+          PortraitPath: res.data.path,
+        }));
+        Swal.fire({
+          title: `${state.name} \nUploaded Successfully!`,
+          icon: "success",
         });
-    }
-    else{
+      } else {
+        Swal.fire({
+          title: "Upload Failed",
+          text: res.data?.message || "Please try again.",
+          icon: "error",
+        });
+      }
+    } catch (err) {
+      console.error("Portrait upload error:", err);
       Swal.fire({
-        title: "Select the Upload patient portrait now button!",
-        // text: 'Do you want to continue',
-        icon: "warning"
-        // confirmButtonText: 'Cool'
-      })
-      
+        title: "Upload Error",
+        text: "Could not upload portrait photo.",
+        icon: "error",
+      });
     }
-    setValues((pre)=>{
-      return{...pre,DoctorId:DoctorUserID}
-    })
-    console.log(values);
 
-    // fd.append("Name",pvs.pvsScan.name);
-    // fd.append("fileContent",pvs.pvsScan)
-    // console.log(pvs.pvsScan);
-
-    // // fd.append("Name",pvs.intraoral.name);
-    // fd.append("fileContent",pvs.intraoral)
-    // console.log(pvs.intraoral);
-
-    // // fd.append("Name",pvs.models.name);
-    // fd.append("fileContent",pvs.models)
-    // console.log(pvs.models);
-
-    // // fd.append("Name",state6.name);
-    // fd.append("fileContent",state6)
-    // console.log(state6);
-
-    // fd.append("Name",state61.name);
-    // fd.append("fileContent",state61)
-    // console.log(state61);
-
-    // fd.append("Name",state62.name);
-    // fd.append("fileContent",state62)
-    // console.log(state62);
-
-    // // fd.append("Name",state63.name);
-    // fd.append("fileContent",state63)
-    // console.log(state63);
-
-    // // fd.append("Name",state64.name);
-    // fd.append("fileContent",state64)
-    // console.log(state64);
-
-    // fd.append("Name",state65.name);
-    // fd.append("fileContent",state65)
-    // console.log(state65);
-
-    // // fd.append("Name",state66.name);
-    // fd.append("fileContent",state66)
-    // console.log(state66);
-
-    // // fd.append("Name",state67.name);
-    // fd.append("fileContent",state67)
-    // console.log(state67);
-
-    // // fd.append("Name",add.name);
-    // fd.append("fileContent",add)
-    // console.log(add);
-
-    // // fd.append("Name",radio.name);
-    // fd.append("fileContent",radio)
-    // console.log(radio);
-
-    // fd.append("Name",radio1.name);
-    // fd.append("fileContent",radio1)
-    // console.log(radio1);
-
-    // console.log(values.PortraitPath);
-
-    // var myHeaders = new Headers();
-    // myHeaders.append("Content-Type", "multipart/mixed");
-
-    // var formdata = new FormData();
-    // formdata.append("MsgPhoto", state, "/C:/Users/www.abcom.in/Downloads/Logoremovebg.png");
-    // formdata.append("Senderid", 1);
-    // formdata.append("Receiverid", 2);
-    // formdata.append("Message", "Hi");
-    // formdata.append("MsgPhoto", "Hi");
-
-    // var requestOptions = {
-    //   method: 'POST',
-    //   headers: myHeaders,
-    //   body: formdata,
-    //   redirect: 'follow'
-    // };
-
-    // fetch("https://infintrixglobal.com/ChatApplication/webservices/insert_usermessage.php", requestOptions)
-    //   .then(response => response.text())
-    //   .then(result => console.log(result))
-    //   .catch(error => console.log('error', error));
-    // setValues((pre)=>{
-    //   return{...pre,DoctorId:DoctorUserID}
-    // })
+    setValues((pre) => {
+      return { ...pre, DoctorId: DoctorUserID };
+    });
 
     setCurrentTab((prev) => prev + 1);
   };
 
-  var pvs1 = document.getElementById("five2");
-  var pvs2 = document.getElementById("five3");
-  var pvs3 = document.getElementById("five4");
-
-
-//   const link = document.querySelector('#five2');
-// let method = link.getAttribute('label');
-// useEffect(()=>{
-// console.log(method);
-// },[])
-  // var pvs1=document.getElementById("five2");
-  // console.log(pvs1);
-
   const handleUpload1 = (e) => {
     e.preventDefault();
 
+    const pvs1El = document.getElementById("five2");
+    const pvs2El = document.getElementById("five3");
+    const pvs3El = document.getElementById("five4");
+
     const fd = new FormData();
-    // fd.append("Name",pvs.pvsScan.name);
-    // fd.append("fileContent",state);
-    // console.log(state);
-    if (pvs1.checked) {
+    if (pvs1El && pvs1El.checked) {
       // setValues((pre)=>{
       //   return{...pre,TypeOfPVSScan:}
       // })
@@ -1334,17 +1010,11 @@ console.log(values.DoctorId);
         });
     }
 
-    if (pvs2.checked) {
-      // Array.from(pvs.intraoral).forEach((up) => {
-      //   fd.append("Name", up.name);
-      //   for(let i=0;i<up.length;i++){
-      //     fd.append("fileContent", up[i]);
-      //     }
-      // });
+    if (pvs2El && pvs2El.checked) {
       fd.append("Name", IntraOral.name);
-        for(let i=0;i<IntraOral.length;i++){
+      for (let i = 0; i < IntraOral.length; i++) {
         fd.append("fileContent", IntraOral[i]);
-        }
+      }
       axios
         .post(
           "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/UploadMultiplePhotos",
@@ -1364,13 +1034,13 @@ console.log(values.DoctorId);
         .then((res) => {
           var arr = res.data;
           console.log(arr);
-          setValues(pre=>{
-            return{...pre,PathOfDoc:res.data}
-          })
+          setValues((pre) => {
+            return { ...pre, PathOfDoc: res.data };
+          });
         });
     }
 
-    if (pvs3.checked) {
+    if (pvs3El && pvs3El.checked) {
       // Array.from(pvs.models).forEach((up) => {
       //   fd.append("Name", up.name);
       //   for(let i=0;i<up.length;i++){

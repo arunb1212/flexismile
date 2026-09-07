@@ -529,14 +529,51 @@ let obj1={
                   <p className="" style={{fontSize:"1.1rem",fontWeight:"bold"}}>Total No. Of Lower Sets : <span style={{fontSize:"1.05rem",fontWeight:"normal"}}>{patient[0]?.TotalNoOfLowerSets}</span></p>
                   </Col>
                 </Row>
-<hr />
-                  <Button onClick={() => {navigate(`/plan-details/${ID}`)}}>
-                    View Plans
+                  <div className="d-flex gap-3 align-items-center mb-3">
+                    <Button onClick={() => {navigate(`/plan-details/${ID}`)}}>
+                      View Plans
                     </Button>
+                  </div>
 
-                <Row className="mt-5">
+                <Row className="mt-4">
                   <Col>
-                  <p className="fs-4">
+                    <p className="fs-4">
+                      <b>Videos</b>
+                    </p>
+                    {((pVids?.length > 0 ? pVids : (videoData || [])).filter((item) => item && (item.PathVideo || item.ParthVideo) && item.PatientVideoId !== 0)).length > 0 ? (
+                      <div className="d-flex flex-wrap gap-3">
+                        {(pVids?.length > 0 ? pVids : (videoData || []))
+                          .filter((item) => item && (item.PathVideo || item.ParthVideo) && item.PatientVideoId !== 0)
+                          .map((item, index) => {
+                            const vUrl = item?.PathVideo || item?.ParthVideo;
+                            return (
+                              <Card key={index} className="p-2 shadow-sm" style={{ width: "340px" }}>
+                                <video
+                                  width="320"
+                                  height="200"
+                                  controls
+                                  preload="metadata"
+                                  src={vUrl}
+                                  className="rounded"
+                                />
+                                {item?.DoctorUploadingVideo && (
+                                  <small className="text-muted mt-1">
+                                    Uploaded by {item.DoctorUploadingVideo} {item.CreateDate ? `on ${item.CreateDate.split(" ")[0]}` : ""}
+                                  </small>
+                                )}
+                              </Card>
+                            );
+                          })}
+                      </div>
+                    ) : (
+                      <p className="text-muted">No videos available/uploaded.</p>
+                    )}
+                  </Col>
+                </Row>
+
+                <Row className="mt-4">
+                  <Col>
+                    <p className="fs-4">
                       <b>Reports</b>
                     </p>
                     {/* <Stack direction="horizontal" gap={5}> */}

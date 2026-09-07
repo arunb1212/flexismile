@@ -1324,18 +1324,30 @@ extra?.IntraOralMoreImagesList && (
                         }}
                       ></img> */}
                       {
-                        pVids?.map((item,index)=>{
-                          return(
-                            <>
-                            
-                            <video width="320" height="240" controls preload="auto">
-  <source src={item?.PathVideo} type="video/mp4"/>
-  {/* <source src={item?.PathVideo} type="video/ogg"></source> */}
-  
-</video>
-                            </>
-                          )
-                        })
+                        (pVids?.length > 0 ? pVids : (videoData || []))
+                          .filter((item) => item && (item.PathVideo || item.ParthVideo) && item.PatientVideoId !== 0)
+                          .map((item, index) => {
+                            const vUrl = item?.PathVideo || item?.ParthVideo;
+                            return (
+                              <div key={index} className="p-2 border rounded shadow-sm bg-light">
+                                <video
+                                  width="320"
+                                  height="240"
+                                  controls
+                                  preload="metadata"
+                                  src={vUrl}
+                                  className="rounded"
+                                />
+                                {item?.DoctorUploadingVideo && (
+                                  <div className="mt-1">
+                                    <small className="text-muted">
+                                      Uploaded by {item.DoctorUploadingVideo} {item.CreateDate ? `on ${item.CreateDate.split(" ")[0]}` : ""}
+                                    </small>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })
                       }
                         {/* <video width="320" height="240" controls>
   <source src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4"/>
