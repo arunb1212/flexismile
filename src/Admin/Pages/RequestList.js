@@ -126,39 +126,147 @@ const [search, setSearch] = useState("");
 
   const [selectedMonth, setSelectedMonth] = useState("all");
   const [loading, setLoading] = useState(false);
+  const [allRequests, setAllRequests] = useState([]);
 
-  const fetchRequests = async (month) => {
+  const fetchAllRequests = async () => {
     setLoading(true);
     try {
-      if (month === "all") {
-        const months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
-        const results = await Promise.all(
-          months.map(m =>
-            fetch(`https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/GetPatientSetsDoctorToAdminlist/0/${m}`)
-              .then(r => r.json())
-              .then(res => (res.status && Array.isArray(res.Data)) ? res.Data : [])
+      const prefixes = [
+        "2", "5", "7", "8", "9",
+        "00","01","02","03","04","05","06","07","08","09",
+        "10","11","12","13","14","15","16","17","18","19",
+        "30","31","32","33","34","35","36","37","38","39",
+        "40","41","42","43","44","45","46","47","48","49",
+        "60","61","62","63","64","65","66","67","68","69"
+      ];
+
+      const [prefixResults, setDetailsRes] = await Promise.all([
+        Promise.all(
+          prefixes.map((p) =>
+            fetch(`https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/GetPatientSetsDoctorToAdminlist/0/${p}`)
+              .then((r) => r.json())
+              .then((res) => (res.status && Array.isArray(res.Data)) ? res.Data : [])
               .catch(() => [])
           )
-        );
-        const combined = results.flat();
-        const seen = new Set();
-        const unique = combined.filter(item => {
-          const key = item.SetsDoctorToAdminId || `${item.PatientId}_${item.PatientSetsId}_${item.RequestDate}`;
-          if (seen.has(key)) return false;
-          seen.add(key);
-          return true;
+        ),
+        fetch("https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/GetPatientTotalsetDetails/0/0/0")
+          .then((r) => r.json())
+          .catch(() => ({ Data: [] }))
+      ]);
+
+      const adminListItems = prefixResults.flat();
+      const recentPatients = (setDetailsRes?.Data || []).slice(0, 50);
+
+      const viewResults = await Promise.all(
+        recentPatients.map((p) =>
+          fetch(`https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/GetPatientTotalsetView/${p.PatientId}/${p.PatientSetsId}`)
+            .then((r) => r.json())
+            .then((res) => {
+              if (res.status && Array.isArray(res.Data) && res.Data.length > 0) {
+                return res.Data.map((d, i) => ({
+                  SetsDoctorToAdminId: `gen_${p.PatientId}_${p.PatientSetsId}_${i}`,
+                  PatientId: p.PatientId,
+                  PatientSetsId: p.PatientSetsId,
+                  Name: p.Name,
+                  CaseNo: p.CaseNo,
+                  ClinicName: p.ClinicName,
+                  DoctorId: p.DoctorId,
+                  DoctorName: p.DoctorName,
+                  TotalNoOfUpperAligners: p.TotalNoOfUpperSets,
+                  TotalNoOfLowerAligners: p.TotalNoOfLowerSets,
+                  TotalAligners: p.NoOfSets,
+                  UpperAligners: d.TextForUpperAligners,
+                  LowerAligners: d.TextForLowerAligners,
+                  PendingAligners: String((parseInt(p.NoOfSets) || 0) - (parseInt(d.NoOfSets) || 0)),
+                  RequestDate: d.DispatchDate,
+                  TotalNoOfSets: "0"
+                }));
+              }
+              return [];
+            })
+            .catch(() => [])
+        )
+      );
+
+      const totalSetItems = viewResults.flat();
+
+      const parseDate = (dStr) => {
+        if (!dStr) return 0;
+        const [dPart, tPart] = dStr.split(" ");
+        const parts = dPart.split("-");
+        if (parts.length === 3) {
+          const iso = `${parts[2]}-${parts[1]}-${parts[0]}${tPart ? `T${tPart}` : "T00:00:00"}`;
+          const t = new Date(iso).getTime();
+          if (!isNaN(t)) return t;
+        }
+        const t = new Date(dStr).getTime();
+        return isNaN(t) ? 0 : t;
+      };
+
+      const mergeAligners = (str1, str2) => {
+        const parse = (s) => (s ? s.toString().split(",").map((x) => x.trim()).filter(Boolean) : []);
+        const combined = Array.from(new Set([...parse(str1), ...parse(str2)]));
+        return combined.sort((a, b) => {
+          const numA = parseInt(a, 10), numB = parseInt(b, 10);
+          if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+          return a.localeCompare(b);
+        }).join(",");
+      };
+
+      const patientMap = new Map();
+
+      const mergeItem = (item) => {
+        if (!item || !item.PatientId) return;
+        const key = String(item.PatientId);
+
+        if (!patientMap.has(key)) {
+          patientMap.set(key, { ...item });
+          return;
+        }
+
+        const existing = patientMap.get(key);
+        const existingTime = parseDate(existing.RequestDate);
+        const itemTime = parseDate(item.RequestDate);
+
+        const newer = itemTime >= existingTime ? item : existing;
+        const older = itemTime >= existingTime ? existing : item;
+
+        const mergedUpper = mergeAligners(existing.UpperAligners, item.UpperAligners);
+        const mergedLower = mergeAligners(existing.LowerAligners, item.LowerAligners);
+
+        let finalSetsDoctorToAdminId = newer.SetsDoctorToAdminId;
+        if (String(finalSetsDoctorToAdminId).startsWith("gen_") && !String(older.SetsDoctorToAdminId).startsWith("gen_")) {
+          finalSetsDoctorToAdminId = older.SetsDoctorToAdminId;
+        }
+
+        patientMap.set(key, {
+          ...older,
+          ...newer,
+          SetsDoctorToAdminId: finalSetsDoctorToAdminId,
+          UpperAligners: mergedUpper,
+          LowerAligners: mergedLower,
+          RequestDate: newer.RequestDate || older.RequestDate,
+          PendingAligners: newer.PendingAligners !== undefined ? newer.PendingAligners : older.PendingAligners,
         });
-        setRequests(unique);
-        setFilteredNames(unique);
-      } else {
-        const res = await fetch(`https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/GetPatientSetsDoctorToAdminlist/0/${month}`);
-        const reqData = await res.json();
-        const dataList = (reqData.status && Array.isArray(reqData.Data)) ? reqData.Data : [];
-        setRequests(dataList);
-        setFilteredNames(dataList);
-      }
+      };
+
+      totalSetItems.forEach(mergeItem);
+      adminListItems.forEach(mergeItem);
+
+      const unique = Array.from(patientMap.values());
+      unique.sort((a, b) => {
+        const dateA = parseDate(a.RequestDate);
+        const dateB = parseDate(b.RequestDate);
+        if (dateB !== dateA) return dateB - dateA;
+        return (parseInt(b.PatientId) || 0) - (parseInt(a.PatientId) || 0);
+      });
+
+      setAllRequests(unique);
+      setRequests(unique);
+      setFilteredNames(unique);
     } catch (err) {
       console.error("Error fetching request list:", err);
+      setAllRequests([]);
       setRequests([]);
       setFilteredNames([]);
     } finally {
@@ -167,8 +275,40 @@ const [search, setSearch] = useState("");
   };
 
   useEffect(() => {
-    fetchRequests(selectedMonth);
-  }, [selectedMonth]);
+    fetchAllRequests();
+  }, []);
+
+  useEffect(() => {
+    let list = Array.isArray(allRequests) ? allRequests : [];
+
+    if (selectedMonth !== "all") {
+      list = list.filter((item) => {
+        if (!item?.RequestDate) return false;
+        const parts = item.RequestDate.split(" ")[0].split("-");
+        const monthNum = parts[1];
+        return monthNum === selectedMonth || parseInt(monthNum) === parseInt(selectedMonth);
+      });
+    }
+
+    setRequests(list);
+
+    const s = (search || "").toLowerCase().trim();
+    if (s) {
+      const filtered = list.filter((item) => {
+        if (!item) return false;
+        return (
+          (item.PatientId?.toString() || "").toLowerCase().includes(s) ||
+          (item.Name || "").toLowerCase().includes(s) ||
+          (item.ClinicName || "").toLowerCase().includes(s) ||
+          (item.CaseNo?.toString() || "").toLowerCase().includes(s) ||
+          (item.DoctorName || "").toLowerCase().includes(s)
+        );
+      });
+      setFilteredNames(filtered);
+    } else {
+      setFilteredNames(list);
+    }
+  }, [selectedMonth, search, allRequests]);
 
 
     const columns = [
@@ -467,21 +607,7 @@ const [search, setSearch] = useState("");
 
 
 
-  useEffect(() => {
-    const list = Array.isArray(requests) ? requests : [];
-    const result = list.filter((item) => {
-      if (!item) return false;
-      const s = (search || "").toLowerCase();
-      return (
-        (item.PatientId?.toString() || "").toLowerCase().includes(s) ||
-        (item.Name || "").toLowerCase().includes(s) ||
-        (item.ClinicName || "").toLowerCase().includes(s) ||
-        (item.CaseNo?.toString() || "").toLowerCase().includes(s) ||
-        (item.DoctorName || "").toLowerCase().includes(s)
-      );
-    });
-    setFilteredNames(result);
-  }, [search, requests]);
+
 
 
 

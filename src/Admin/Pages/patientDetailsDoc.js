@@ -540,11 +540,29 @@ let obj1={
                     <p className="fs-4">
                       <b>Videos</b>
                     </p>
-                    {((pVids?.length > 0 ? pVids : (videoData || [])).filter((item) => item && (item.PathVideo || item.ParthVideo) && item.PatientVideoId !== 0)).length > 0 ? (
-                      <div className="d-flex flex-wrap gap-3">
-                        {(pVids?.length > 0 ? pVids : (videoData || []))
-                          .filter((item) => item && (item.PathVideo || item.ParthVideo) && item.PatientVideoId !== 0)
-                          .map((item, index) => {
+                    {(() => {
+                      const allVideos = [];
+                      const seen = new Set();
+                      const candidates = [...(pVids || []), ...(videoData || [])];
+                      for (const item of candidates) {
+                        if (!item) continue;
+                        const url = item.PathVideo || item.ParthVideo;
+                        if (!url || item.PatientVideoId === 0) continue;
+                        const filename = url.split("/").pop();
+                        const key = item.PatientVideoId || filename;
+                        if (key && !seen.has(key)) {
+                          seen.add(key);
+                          allVideos.push(item);
+                        }
+                      }
+
+                      if (allVideos.length === 0) {
+                        return <p className="text-muted">No videos available/uploaded.</p>;
+                      }
+
+                      return (
+                        <div className="d-flex flex-wrap gap-3">
+                          {allVideos.map((item, index) => {
                             const vUrl = item?.PathVideo || item?.ParthVideo;
                             return (
                               <Card key={index} className="p-2 shadow-sm" style={{ width: "340px" }}>
@@ -564,10 +582,9 @@ let obj1={
                               </Card>
                             );
                           })}
-                      </div>
-                    ) : (
-                      <p className="text-muted">No videos available/uploaded.</p>
-                    )}
+                        </div>
+                      );
+                    })()}
                   </Col>
                 </Row>
 

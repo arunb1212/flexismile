@@ -74,10 +74,10 @@ function RequestAligners(){
     let DoctorName = sessionStorage.getItem("DocPracName");
   
     let DoctorUId = sessionStorage.getItem("DocUserId");
+    let RoleId = sessionStorage.getItem("Role");
 
-
-let apiurl=`https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/GetPatientSetDoctorRequestlist/0/0/${DoctorUId}`
-
+    const [loading, setLoading] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
 const [data, setData] = useState([])
 
@@ -92,19 +92,13 @@ const [requestSets, setRequestSets] = useState({
   PatientTotalSetsId:"",
   TextForUpperAligners:[],
   TextForLowerAligners:[],
-
 })
-
 
 const [checkSets, setCheckSets] = useState({
   Uppersets:"",
   Lowersets:"",
   PatientId:""
 })
-
-
-
-
 
 const onChangeRequest=(e)=>{
   const newdata={...requestSets}
@@ -113,8 +107,8 @@ const onChangeRequest=(e)=>{
   setRequestSets(newdata);
   console.log(newdata);
 
-  let lengthOfUpper=newdata.TextForUpperAligners.split(",").length;
-  let lengthOfLower=newdata.TextForLowerAligners.split(",").length;
+  let lengthOfUpper=typeof newdata.TextForUpperAligners === "string" ? newdata.TextForUpperAligners.split(",").length : (newdata.TextForUpperAligners || []).length;
+  let lengthOfLower=typeof newdata.TextForLowerAligners === "string" ? newdata.TextForLowerAligners.split(",").length : (newdata.TextForLowerAligners || []).length;
   let noOfSets=lengthOfUpper+lengthOfLower;
 
   setRequestSets((pre)=>{
@@ -125,59 +119,64 @@ const onChangeRequest=(e)=>{
   })
 
   console.log(noOfSets);
-
-// let UpperNo=newdata.TextForUpperAligners;
-// let LowerNo=newdata.TextForLowerAligners;
-//   setCheckSets((pre)=>{
-//     return{
-//       ...pre,
-//       Uppersets:UpperNo,
-//       Lowersets:LowerNo
-//     }
-//   })
-
-// console.log("Checking Sets");
-// console.log(checkSets);
-
-
-  // const checkUrl=`https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/CheckSets`;
-
-
-
-  // let n={
-  //   ...checkSets,
-  //   Uppersets:UpperNo,
-  //   Lowersets:LowerNo
-  // }
-  // fetch(checkUrl,{
-  //   method:"POST",
-  //     headers:{
-  //       Accept: "application/json",
-  //       'Content-Type': 'application/json'
-  //     },
-  //     body: JSON.stringify(n)
-  // })
-  // .then((res)=>res.json())
-  // .then((checked)=>{
-  //   console.log(checked);
-  //   if(checked.IsCheck===1){
-  //     handleShowOrder1();
-  //     handleCloseRequest();
-  //   }
-  // })
 }
 
+const fetchData = async () => {
+  setLoading(true);
+  try {
+    const docId = (RoleId === "1" && !DoctorUId) ? 0 : (DoctorUId || 0);
+    const [reqListRes, allPatRes] = await Promise.all([
+      fetch(`https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/GetPatientSetDoctorRequestlist/0/0/${docId}`)
+        .then((r) => r.json())
+        .catch(() => ({ Data: [] })),
+      fetch(`https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/GetDoctorWisePatientList/0/0/${docId}`)
+        .then((r) => r.json())
+        .catch(() => ({ Data: [] })),
+    ]);
 
-useEffect(()=>{
-fetch(apiurl)
-.then((res)=>res.json())
-.then((reqlist)=>{
-  console.log(reqlist.Data);
-  setData(reqlist.Data);
-  setFilteredNames(reqlist.Data)
-})
-},[])
+    const reqData = Array.isArray(reqListRes?.Data) ? reqListRes.Data : [];
+    const allPatData = Array.isArray(allPatRes?.Data) ? allPatRes.Data : [];
 
+    // Map existing patient IDs in reqData
+    const existingPatientIds = new Set(reqData.map((p) => String(p.PatientId)));
+
+    // Find patients from allPatData who are not yet in reqData (newly registered patients)
+    const missingPatients = allPatData.filter(
+      (p) => !existingPatientIds.has(String(p.PatientId))
+    );
+
+    // Format new patients so they match the table structure
+    const formattedNewPatients = missingPatients.map((p) => ({
+      ...p,
+      PatientSetsId: p.PatientSetsId || "",
+      PatientTotalSetsId: "0",
+      TotalNoOfUpperSets: p.TotalNoOfUpperSets || p.ExpectedNoOfAligners || "",
+      TotalNoOfLowerSets: p.TotalNoOfLowerSets || p.ExpectedNoOfAligners || "",
+      NoOfSets:
+        p.NoOfSets ||
+        (p.ExpectedNoOfAligners ? String(parseInt(p.ExpectedNoOfAligners) * 2) : ""),
+      Quotation: p.Quotation || "",
+      AmountPaid: p.AmountPaid || "",
+      DateOn: p.RegDate || "",
+      UpperSetsData: [],
+      LowerSetsData: [],
+      isNewPatient: true,
+    }));
+
+    const combinedData = [...reqData, ...formattedNewPatients];
+
+    setData(combinedData);
+    setFilteredNames(combinedData);
+  } catch (error) {
+    console.error("Error fetching request aligners data:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  fetchData();
+}, [DoctorUId]);
 
 const [totalUpper, setTotalUpper] = useState(0);
 const [totalLower, setTotalLower] = useState(0);
@@ -204,35 +203,35 @@ const [totalLower, setTotalLower] = useState(0);
         {
           id:"center",
           name: "Total Upper Aligners",
-          selector: (row) => row.TotalNoOfUpperSets,
+          selector: (row) => row.TotalNoOfUpperSets || row.ExpectedNoOfAligners || "-",
         },
         {
           id:"center",
           name: "Total Lower Aligners",
-          selector: (row) => row.TotalNoOfLowerSets,
+          selector: (row) => row.TotalNoOfLowerSets || row.ExpectedNoOfAligners || "-",
         },
         {
           id:"center",
           name: "Total No. of Aligners",
-          selector: (row) => row.NoOfSets,
+          selector: (row) => row.NoOfSets || (row.ExpectedNoOfAligners ? String(parseInt(row.ExpectedNoOfAligners) * 2) : "-"),
         },
     
         {
           id:"center",
           name: "Total Amount",
-          selector: (row) => row.Quotation,
+          selector: (row) => row.Quotation || "-",
           sortable: true,
         },
         {
           id:"center",
           name: "Pending Amount",
-          selector: (row) => row.Quotation-row.AmountPaid,
+          selector: (row) => (row.Quotation && row.AmountPaid) ? (parseFloat(row.Quotation) - parseFloat(row.AmountPaid)).toFixed(2) : "-",
           sortable: true,
         },
         {
           id:"center",
           name: "Last Order Date",
-          selector: (row) => row.DateOn ? row.DateOn.split(" ")[0] : "-",
+          selector: (row) => row.DateOn ? row.DateOn.split(" ")[0] : (row.RegDate ? row.RegDate.split(" ")[0] : "-"),
           sortable: true,
         },
        
@@ -241,33 +240,59 @@ const [totalLower, setTotalLower] = useState(0);
           id:"center",
           name:"Request for Aligners",
           cell: (row) => (
-            <Button variant="" className="edit-patient-btn" onClick={()=>{
+            <Button variant="" className="edit-patient-btn" onClick={async ()=>{
               setUpperChecked([]);
               setLowerChecked([]);
               setIsCompleteSet(false);
-              handleShowRequest();
-              setRequestSets((pre)=>{
-                return{...pre,PatientSetsId:row.PatientSetsId,
-                PatientId:row.PatientId,
-                // NoOfSets:row.NoOfSets,
-                DoctorId:DoctorUId,
-                PatientTotalSetsId:row.PatientTotalSetsId,
-                TextForUpperAligners: [],
-                TextForLowerAligners: []
+              setAlignerType("");
+
+              let upperCount = parseInt(row.TotalNoOfUpperSets) || 0;
+              let lowerCount = parseInt(row.TotalNoOfLowerSets) || 0;
+
+              if (!upperCount || !lowerCount) {
+                try {
+                  const pRes = await fetch(`https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/GetPatientAllList/${row.PatientId}`);
+                  const pData = await pRes.json();
+                  const pInfo = pData?.Data?.[0];
+                  if (pInfo) {
+                    const exp = parseInt(pInfo.ExpectedNoOfAligners) || 20;
+                    upperCount = parseInt(pInfo.TotalNoOfUpperSets) || exp;
+                    lowerCount = parseInt(pInfo.TotalNoOfLowerSets) || exp;
+                  }
+                } catch (e) {
+                  console.error("Error fetching patient details:", e);
                 }
-              })
+              }
+
+              if (!upperCount) upperCount = 20;
+              if (!lowerCount) lowerCount = 20;
+
+              setTotalUpper(upperCount);
+              setTotalLower(lowerCount);
+
+              setRequestSets((pre)=>{
+                return{
+                  ...pre,
+                  PatientSetsId:row.PatientSetsId || "",
+                  PatientId:row.PatientId,
+                  DoctorId:DoctorUId,
+                  PatientTotalSetsId:row.PatientTotalSetsId || "0",
+                  TotalNoOfUpperSets: upperCount,
+                  TotalNoOfLowerSets: lowerCount,
+                  NoOfSets: upperCount + lowerCount,
+                  TextForUpperAligners: [],
+                  TextForLowerAligners: []
+                }
+              });
 
               setCheckSets((pre)=>{
                 return{
                   ...pre,
                   PatientId:row.PatientId
                 }
-              })
+              });
 
-
-              setTotalUpper(row.TotalNoOfUpperSets);
-              setTotalLower(row.TotalNoOfLowerSets);
-             
+              handleShowRequest();
             }}>
               Request
             </Button>
@@ -496,7 +521,7 @@ const [totalLower, setTotalLower] = useState(0);
           TextForUpperAligners:UpperSetsReqBody.Uppersets
         }
       })
-      if (typeof checkbox === 'number') {
+      if (typeof checkbox === 'number' && requestSets.PatientSetsId) {
         uppercheckFunc();
       }
     }
@@ -588,7 +613,7 @@ const [totalLower, setTotalLower] = useState(0);
           TextForLowerAligners:LowerSetsReqBody.Lowersets
         }
       })
-      if (typeof checkbox === 'number') {
+      if (typeof checkbox === 'number' && requestSets.PatientSetsId) {
         lowercheckFunc();
       }
     }
@@ -726,20 +751,15 @@ const [totalLower, setTotalLower] = useState(0);
                   expandableRows
                   expandableRowsComponent={({data})=>{
 
-                    let lower=data.LowerSetsData.map(i=>i.NoOfLowerSets);
-                    let upper=data.UpperSetsData.map(i=>i.NoOfUpperSets);
-                    console.log(lower.toString());
+                    let lower=(data?.LowerSetsData || []).map(i=>i.NoOfLowerSets);
+                    let upper=(data?.UpperSetsData || []).map(i=>i.NoOfUpperSets);
                     return (
-                      <>
-                      {/* <p>{data.PatientId}</p> */}
-<Row>
-  <Col>
-  
-                      <p>Ordered Upper Aligners: <span>{upper.toString()}</span></p>
-                      <p>Ordered Lower Aligners: <span>{lower.toString()}</span></p>
-  </Col>
-</Row>
-                      </>
+                      <Row className="p-3" style={{ backgroundColor: "#fafafa" }}>
+                        <Col>
+                          <p className="mb-1">Ordered Upper Aligners: <span>{upper.length > 0 ? upper.join(", ") : "None"}</span></p>
+                          <p className="mb-0">Ordered Lower Aligners: <span>{lower.length > 0 ? lower.join(", ") : "None"}</span></p>
+                        </Col>
+                      </Row>
                     )
                   }}
                 //  onRowClicked={(e)=>{
@@ -828,6 +848,48 @@ const [totalLower, setTotalLower] = useState(0);
                   </div>
                   <hr />
 
+                  <Row className="mb-3">
+                    <Col md={6}>
+                      <Form.Group controlId="totalUpperInput">
+                        <Form.Label className="modal-lbl">Total Upper Sets Count</Form.Label>
+                        <Form.Control
+                          type="number"
+                          min="1"
+                          max="100"
+                          value={totalUpper}
+                          onChange={(e) => {
+                            const val = Math.max(0, parseInt(e.target.value) || 0);
+                            setTotalUpper(val);
+                            setRequestSets((pre) => ({
+                              ...pre,
+                              TotalNoOfUpperSets: val,
+                              NoOfSets: val + (parseInt(totalLower) || 0),
+                            }));
+                          }}
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                      <Form.Group controlId="totalLowerInput">
+                        <Form.Label className="modal-lbl">Total Lower Sets Count</Form.Label>
+                        <Form.Control
+                          type="number"
+                          min="1"
+                          max="100"
+                          value={totalLower}
+                          onChange={(e) => {
+                            const val = Math.max(0, parseInt(e.target.value) || 0);
+                            setTotalLower(val);
+                            setRequestSets((pre) => ({
+                              ...pre,
+                              TotalNoOfLowerSets: val,
+                              NoOfSets: (parseInt(totalUpper) || 0) + val,
+                            }));
+                          }}
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
                   
                   <Form.Group
                     className="mb-3"
@@ -845,8 +907,11 @@ const [totalLower, setTotalLower] = useState(0);
                       </label>
                       {checkboxes.map((checkbox,i) => (
                         <label key={checkbox} className="m-3 text-center">
-                          <input type="checkbox" checked={requestSets.TextForUpperAligners.includes(i+1)}
-                          onChange={() => handleCheckboxChange(checkbox)}/> <br />
+                          <input
+                            type="checkbox"
+                            checked={requestSets.TextForUpperAligners.includes(checkbox) || UpperChecked.includes(checkbox)}
+                            onChange={() => handleCheckboxChange(checkbox)}
+                          /> <br />
                            <span className="">{checkbox}</span>
                         </label>
                       ))}
@@ -878,7 +943,11 @@ const [totalLower, setTotalLower] = useState(0);
                       </label>
                       {checkboxes1.map((checkbox,i) => (
                         <label key={checkbox} className="m-3 text-center">
-                          <input type="checkbox" checked={requestSets.TextForLowerAligners.includes(i+1)} onChange={() => handleCheckboxChange1(checkbox)}/> <br />
+                          <input
+                            type="checkbox"
+                            checked={requestSets.TextForLowerAligners.includes(checkbox) || LowerChecked.includes(checkbox)}
+                            onChange={() => handleCheckboxChange1(checkbox)}
+                          /> <br />
                            <span className="">{checkbox}</span>
                         </label>
                       ))}
@@ -938,67 +1007,103 @@ const [totalLower, setTotalLower] = useState(0);
                   <Button
                     type="submit"
                     variant=""
+                    disabled={submitting}
                     style={{
                       backgroundColor: "#C49358",
                       color: "white",
                     }}
-                    onClick={(e)=>{
-                      const reqUrl="https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/AddSetsDoctorToAdmin";
-
-
-                      let n={
-                        ...requestSets,
-                        AlignerType: alignerType,
-                        TextForUpperAligners:requestSets.TextForUpperAligners.toString(),
-                        TextForLowerAligners:requestSets.TextForLowerAligners.toString()
+                    onClick={async (e) => {
+                      if (!requestSets.DateOn) {
+                        Swal.fire({
+                          icon: "warning",
+                          title: "Date is required!",
+                        });
+                        return;
                       }
 
-                      console.log(n);
+                      setSubmitting(true);
+                      try {
+                        let currentPatientSetsId = requestSets.PatientSetsId;
 
-                      if(requestSets.DateOn===""){
+                        // If new patient without PatientSetsId, create the PatientSets entry first
+                        if (!currentPatientSetsId || currentPatientSetsId === "0" || currentPatientSetsId === "") {
+                          try {
+                            const initSetsUrl = "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/AddPatientTotalSets";
+                            await fetch(initSetsUrl, {
+                              method: "POST",
+                              headers: {
+                                Accept: "application/json",
+                                "Content-Type": "application/json",
+                              },
+                              body: JSON.stringify({
+                                PatientId: String(requestSets.PatientId),
+                                TotalNoOfUpperSets: String(totalUpper || 20),
+                                TotalNoOfLowerSets: String(totalLower || 20),
+                              }),
+                            });
+
+                            // Retrieve the generated PatientSetsId
+                            const docId = (RoleId === "1" && !DoctorUId) ? 0 : (DoctorUId || 0);
+                            const checkRes = await fetch(`https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/GetPatientSetDoctorRequestlist/0/0/${docId}`);
+                            const checkData = await checkRes.json();
+                            const found = (checkData?.Data || []).find((p) => String(p.PatientId) === String(requestSets.PatientId));
+                            if (found && found.PatientSetsId) {
+                              currentPatientSetsId = found.PatientSetsId;
+                            }
+                          } catch (initErr) {
+                            console.error("Error creating patient sets:", initErr);
+                          }
+                        }
+
+                        const reqUrl = "https://www.orthosquareportal.com/FlexismileApi/FlexAlign.svc/AddSetsDoctorToAdmin";
+
+                        let n = {
+                          ...requestSets,
+                          PatientSetsId: currentPatientSetsId || requestSets.PatientSetsId || 0,
+                          AlignerType: alignerType,
+                          TextForUpperAligners: (requestSets.TextForUpperAligners || []).toString(),
+                          TextForLowerAligners: (requestSets.TextForLowerAligners || []).toString(),
+                        };
+
+                        console.log("Submitting request:", n);
+
+                        const res = await fetch(reqUrl, {
+                          method: "POST",
+                          headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                          },
+                          body: JSON.stringify(n),
+                        });
+                        const request = await res.json();
+                        console.log(request);
+                        if (request.status === true) {
+                          Swal.fire({
+                            title: "Submitted Successfully!",
+                            icon: "success",
+                          });
+                          setTimeout(() => {
+                            window.location.reload();
+                          }, 2000);
+                        } else {
+                          Swal.fire({
+                            title: "Something went wrong!",
+                            text: request.message || "",
+                            icon: "error",
+                          });
+                        }
+                      } catch (err) {
+                        console.error("Submission error:", err);
                         Swal.fire({
-                          icon:"warning",
-                          title:"Date is required!"
-                        })
-                      }else{
-          fetch(reqUrl,{
-            method: "POST",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(n),
-           })
-           .then((res)=>res.json())
-           .then((request)=>{
-            // console.log(request);
-            console.log(request);
-            if(request.status===true){
-              Swal.fire({
-                title:"Submitted Successfully!",
-                icon:"success"
-              })
-
-               setTimeout(() => {
-              
-               window.location.reload();
-            }, 2000);
-            console.log(n);
-            }
-            else{
-              Swal.fire({
-                title:"Something went wrong!",
-                icon:"error"
-              })
-            }
-
-           
-       
-           })}
+                          title: "Something went wrong!",
+                          icon: "error",
+                        });
+                      } finally {
+                        setSubmitting(false);
+                      }
                     }}
-                    
                   >
-                    Submit
+                    {submitting ? "Submitting..." : "Submit"}
                   </Button>
                 </Modal.Footer>
               </Modal>

@@ -408,10 +408,22 @@ extra?.IntraOralMoreImagesList && (
                      
                       <Col>
                         {(() => {
-                          const validVideos = (pVids?.length > 0 ? pVids : (videoData || []))
-                            .filter((i) => i && (i.PathVideo || i.ParthVideo) && i.PatientVideoId !== 0);
+                          const allVideos = [];
+                          const seen = new Set();
+                          const candidates = [...(pVids || []), ...(videoData || [])];
+                          for (const item of candidates) {
+                            if (!item) continue;
+                            const url = item.PathVideo || item.ParthVideo;
+                            if (!url || item.PatientVideoId === 0) continue;
+                            const filename = url.split("/").pop();
+                            const key = item.PatientVideoId || filename;
+                            if (key && !seen.has(key)) {
+                              seen.add(key);
+                              allVideos.push(item);
+                            }
+                          }
 
-                          if (validVideos.length === 0) {
+                          if (allVideos.length === 0) {
                             return (
                               <Row className="d-flex p-4 justify-content-center align-items-center">
                                 <Col>
@@ -421,42 +433,33 @@ extra?.IntraOralMoreImagesList && (
                             );
                           }
 
-                          return validVideos.map((item, index) => {
-                            const vUrl = item?.PathVideo || item?.ParthVideo;
-                            return (
-                              <div key={index} className="mb-3">
-                                <video
-                                  width="320"
-                                  height="240"
-                                  controls
-                                  preload="metadata"
-                                  className="vid-items"
-                                  src={vUrl}
-                                />
-                                <br />
-                                {item?.IsConfirm === "YES" ? (
-                                  <p className="vid-status mx-5 px-5">Video Approved!</p>
-                                ) : ""}
-                                {item?.IsConfirm === "No" ? (
-                                  <p className="mx-5 px-5 vid-status2">Video Rejected!</p>
-                                ) : ""}
-                              </div>
-                            );
-                          });
+                          return (
+                            <div className="d-flex flex-wrap gap-3">
+                              {allVideos.map((item, index) => {
+                                const vUrl = item?.PathVideo || item?.ParthVideo;
+                                return (
+                                  <div key={index} className="mb-3 p-2 border rounded shadow-sm bg-light" style={{ width: "340px" }}>
+                                    <video
+                                      width="320"
+                                      height="240"
+                                      controls
+                                      preload="metadata"
+                                      className="vid-items rounded"
+                                      src={vUrl}
+                                    />
+                                    <br />
+                                    {item?.IsConfirm === "YES" ? (
+                                      <p className="vid-status text-center mt-2">Video Approved!</p>
+                                    ) : ""}
+                                    {item?.IsConfirm === "No" ? (
+                                      <p className="vid-status2 text-center mt-2">Video Rejected!</p>
+                                    ) : ""}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          );
                         })()}  
-                          
-
-                          
-
-
-
-
-                         
-
-
-
-                        }
-
                       </Col>
                       
                     </Row>

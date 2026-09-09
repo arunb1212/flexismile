@@ -1313,23 +1313,32 @@ extra?.IntraOralMoreImagesList && (
                   <p className="fs-4">
                       <b>Videos</b>{videoData[0]?.CreateDate && videoData[0]?.DoctorUploadingVideo?<span style={{fontSize:"18px"}} className="mx-2">- <u>Uploaded by {videoData[0]?.DoctorUploadingVideo} on {videoData[0]?.CreateDate.split(" ")[0]}</u>.</span>:""}
                     </p>
-                    <Stack direction="horizontal" gap={5} className="vid-row">
-                      {/* <img
-                        src={user}
-                        className="rounded"
-                        style={{
-                          boxShadow: "0px 5px 5px 5px #E8E8E8",
-                          height: "100px",
-                          width: "100px",
-                        }}
-                      ></img> */}
-                      {
-                        (pVids?.length > 0 ? pVids : (videoData || []))
-                          .filter((item) => item && (item.PathVideo || item.ParthVideo) && item.PatientVideoId !== 0)
-                          .map((item, index) => {
+                    {(() => {
+                      const allVideos = [];
+                      const seen = new Set();
+                      const candidates = [...(pVids || []), ...(videoData || [])];
+                      for (const item of candidates) {
+                        if (!item) continue;
+                        const url = item.PathVideo || item.ParthVideo;
+                        if (!url || item.PatientVideoId === 0) continue;
+                        const filename = url.split("/").pop();
+                        const key = item.PatientVideoId || filename;
+                        if (key && !seen.has(key)) {
+                          seen.add(key);
+                          allVideos.push(item);
+                        }
+                      }
+
+                      if (allVideos.length === 0) {
+                        return <p className="text-muted">No videos available/uploaded.</p>;
+                      }
+
+                      return (
+                        <div className="d-flex flex-wrap gap-3 mt-2">
+                          {allVideos.map((item, index) => {
                             const vUrl = item?.PathVideo || item?.ParthVideo;
                             return (
-                              <div key={index} className="p-2 border rounded shadow-sm bg-light">
+                              <div key={index} className="p-2 border rounded shadow-sm bg-light" style={{ width: "340px" }}>
                                 <video
                                   width="320"
                                   height="240"
@@ -1347,13 +1356,10 @@ extra?.IntraOralMoreImagesList && (
                                 )}
                               </div>
                             );
-                          })
-                      }
-                        {/* <video width="320" height="240" controls>
-  <source src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4"/>
-
-                      </video> */}
-                    </Stack>
+                          })}
+                        </div>
+                      );
+                    })()}
                   </Col>
                 </Row>
                 
